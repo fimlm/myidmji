@@ -9,6 +9,7 @@ import { z } from "zod"
 
 import type { Body_login_login_access_token as AccessToken } from "@/client"
 import { AuthLayout } from "@/components/Common/AuthLayout"
+import { GoogleLoginButton } from "@/components/Common/GoogleLoginButton"
 import {
   Form,
   FormControl,
@@ -67,7 +68,6 @@ function Login() {
     loginMutation.mutate(data)
   }
 
-
   return (
     <AuthLayout>
       <Form {...form}>
@@ -77,6 +77,22 @@ function Login() {
         >
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">Login to your account</h1>
+            <div className="text-sm text-balance text-muted-foreground">
+              Enter your email below to login to your account
+            </div>
+          </div>
+
+          <GoogleLoginButton />
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with email
+              </span>
+            </div>
           </div>
 
           <div className="grid gap-4">

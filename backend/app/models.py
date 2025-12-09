@@ -103,6 +103,10 @@ class Token(SQLModel):
     token_type: str = "bearer"
 
 
+class TokenGoogle(SQLModel):
+    token: str
+
+
 # Contents of JWT token
 class TokenPayload(SQLModel):
     sub: str | None = None

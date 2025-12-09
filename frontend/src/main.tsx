@@ -1,3 +1,4 @@
+import { GoogleOAuthProvider } from "@react-oauth/google"
 import {
   MutationCache,
   QueryCache,
@@ -44,7 +45,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <GoogleOAuthProvider
+          clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ""}
+        >
+          <RouterProvider router={router} />
+        </GoogleOAuthProvider>
         <Toaster richColors closeButton />
       </QueryClientProvider>
     </ThemeProvider>

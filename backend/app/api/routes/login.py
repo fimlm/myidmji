@@ -10,7 +10,7 @@ from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
 from app.core.config import settings
 from app.core.security import get_password_hash
-from app.models import Message, NewPassword, Token, UserPublic
+from app.models import Message, NewPassword, Token, TokenGoogle, UserCreate, UserPublic
 from app.utils import (
     generate_password_reset_token,
     generate_reset_password_email,
@@ -41,6 +41,56 @@ def login_access_token(
             user.id, expires_delta=access_token_expires
         )
     )
+
+
+@router.post("/login/google")
+def login_google(token_data: TokenGoogle, session: SessionDep) -> Token:
+    """
+    Login with Google ID Token.
+    Verifies the token with Google, creates a user if not exists, and returns a JWT.
+    """
+    try:
+        # Verify the token
+        from google.oauth2 import id_token
+        from google.auth.transport import requests
+
+        id_info = id_token.verify_oauth2_token(
+            token_data.token, requests.Request(), settings.GOOGLE_CLIENT_ID
+        )
+
+        email = id_info.get("email")
+        if not email:
+            raise HTTPException(status_code=400, detail="Invalid Google Token: No email found")
+        
+        # Check if user exists
+        user = crud.get_user_by_email(session=session, email=email)
+        if not user:
+            # Create user
+            import secrets
+            password = secrets.token_urlsafe(32)
+            user_in = UserCreate(
+                email=email,
+                password=password,
+                full_name=id_info.get("name"),
+                is_active=True
+            )
+            user = crud.create_user(session=session, user_create=user_in)
+        
+        if not user.is_active:
+             raise HTTPException(status_code=400, detail="Inactive user")
+
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        return Token(
+            access_token=security.create_access_token(
+                user.id, expires_delta=access_token_expires
+            )
+        )
+
+    except ValueError as e:
+        # Invalid token
+        raise HTTPException(status_code=400, detail=f"Invalid Google Token: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Google Login Failed: {str(e)}")
 
 
 @router.post("/login/test-token", response_model=UserPublic)
