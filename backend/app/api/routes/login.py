@@ -51,17 +51,17 @@ def login_google(token_data: TokenGoogle, session: SessionDep) -> Token:
     """
     try:
         # Verify the token
-        from google.oauth2 import id_token
         from google.auth.transport import requests
+        from google.oauth2 import id_token
 
-        id_info = id_token.verify_oauth2_token(
+        id_info = id_token.verify_oauth2_token(  # type: ignore[no-untyped-call]
             token_data.token, requests.Request(), settings.GOOGLE_CLIENT_ID
         )
 
         email = id_info.get("email")
         if not email:
             raise HTTPException(status_code=400, detail="Invalid Google Token: No email found")
-        
+
         # Check if user exists
         user = crud.get_user_by_email(session=session, email=email)
         if not user:
@@ -75,7 +75,7 @@ def login_google(token_data: TokenGoogle, session: SessionDep) -> Token:
                 is_active=True
             )
             user = crud.create_user(session=session, user_create=user_in)
-        
+
         if not user.is_active:
              raise HTTPException(status_code=400, detail="Inactive user")
 

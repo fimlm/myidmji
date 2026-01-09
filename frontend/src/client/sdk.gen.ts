@@ -3,7 +3,325 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { EventsCreateChurchData, EventsCreateChurchResponse, EventsReadChurchesData, EventsReadChurchesResponse, EventsCreateEventData, EventsCreateEventResponse, EventsReadEventsData, EventsReadEventsResponse, EventsUpdateEventData, EventsUpdateEventResponse, EventsInviteChurchToEventData, EventsInviteChurchToEventResponse, EventsGetEventChurchesData, EventsGetEventChurchesResponse, EventsGetEventStatsData, EventsGetEventStatsResponse, EventsGetEventAttendeesData, EventsGetEventAttendeesResponse, EventsGetEventDigitersData, EventsGetEventDigitersResponse, EventsGetMyEventsResponse, EventsInviteChurchesBulkData, EventsInviteChurchesBulkResponse, EventsInviteChurchesCreateBulkData, EventsInviteChurchesCreateBulkResponse, EventsRegisterAttendeeData, EventsRegisterAttendeeResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginLoginGoogleData, LoginLoginGoogleResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersUpdateUsersBulkData, UsersUpdateUsersBulkResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+
+export class EventsService {
+    /**
+     * Create Church
+     * Create new church.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns ChurchPublic Successful Response
+     * @throws ApiError
+     */
+    public static createChurch(data: EventsCreateChurchData): CancelablePromise<EventsCreateChurchResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/events/churches',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Read Churches
+     * Retrieve churches.
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns ChurchesPublic Successful Response
+     * @throws ApiError
+     */
+    public static readChurches(data: EventsReadChurchesData = {}): CancelablePromise<EventsReadChurchesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/churches',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Event
+     * Create new event.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns EventPublic Successful Response
+     * @throws ApiError
+     */
+    public static createEvent(data: EventsCreateEventData): CancelablePromise<EventsCreateEventResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/events/events',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Read Events
+     * Retrieve events.
+     * @param data The data for the request.
+     * @param data.skip
+     * @param data.limit
+     * @returns EventPublic Successful Response
+     * @throws ApiError
+     */
+    public static readEvents(data: EventsReadEventsData = {}): CancelablePromise<EventsReadEventsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/events',
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Event
+     * Update an event.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.requestBody
+     * @returns EventPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateEvent(data: EventsUpdateEventData): CancelablePromise<EventsUpdateEventResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/events/{event_id}',
+            path: {
+                event_id: data.eventId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Invite Church To Event
+     * Invite a church to an event and assign quota.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.churchId
+     * @param data.quota
+     * @returns EventPublic Successful Response
+     * @throws ApiError
+     */
+    public static inviteChurchToEvent(data: EventsInviteChurchToEventData): CancelablePromise<EventsInviteChurchToEventResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/events/events/{event_id}/invite',
+            path: {
+                event_id: data.eventId
+            },
+            query: {
+                church_id: data.churchId,
+                quota: data.quota
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Event Churches
+     * Get all churches invited to this event.
+     * Accessible to all digiters (needed for onboarding).
+     * @param data The data for the request.
+     * @param data.eventId
+     * @returns ChurchesPublic Successful Response
+     * @throws ApiError
+     */
+    public static getEventChurches(data: EventsGetEventChurchesData): CancelablePromise<EventsGetEventChurchesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/events/{event_id}/churches',
+            path: {
+                event_id: data.eventId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Event Stats
+     * Get detailed statistics for an event.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @returns EventStats Successful Response
+     * @throws ApiError
+     */
+    public static getEventStats(data: EventsGetEventStatsData): CancelablePromise<EventsGetEventStatsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/events/{event_id}/stats',
+            path: {
+                event_id: data.eventId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Event Attendees
+     * Get all attendees registered for an event.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.skip
+     * @param data.limit
+     * @returns AttendeePublic Successful Response
+     * @throws ApiError
+     */
+    public static getEventAttendees(data: EventsGetEventAttendeesData): CancelablePromise<EventsGetEventAttendeesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/events/{event_id}/attendees',
+            path: {
+                event_id: data.eventId
+            },
+            query: {
+                skip: data.skip,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Event Digiters
+     * Get all digiters associated with churches invited to this event.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @returns UserPublic Successful Response
+     * @throws ApiError
+     */
+    public static getEventDigiters(data: EventsGetEventDigitersData): CancelablePromise<EventsGetEventDigitersResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/events/{event_id}/digiters',
+            path: {
+                event_id: data.eventId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get My Events
+     * Get all active events that the current user's church is invited to.
+     * @returns EventPublic Successful Response
+     * @throws ApiError
+     */
+    public static getMyEvents(): CancelablePromise<EventsGetMyEventsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/my-events'
+        });
+    }
+    
+    /**
+     * Invite Churches Bulk
+     * Invite multiple churches to an event with quotas.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.requestBody
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static inviteChurchesBulk(data: EventsInviteChurchesBulkData): CancelablePromise<EventsInviteChurchesBulkResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/events/events/{event_id}/invite-bulk',
+            path: {
+                event_id: data.eventId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Invite Churches Create Bulk
+     * Invite multiple churches by NAME.
+     * If church exists, use it. If not, create it.
+     * Then set quota.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.requestBody
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static inviteChurchesCreateBulk(data: EventsInviteChurchesCreateBulkData): CancelablePromise<EventsInviteChurchesCreateBulkResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/events/events/{event_id}/invite-create-bulk',
+            path: {
+                event_id: data.eventId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Register Attendee
+     * Register an attendee for an event.
+     * Transactional check: Ensures Church Quota is not exceeded and Date is valid.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.requestBody
+     * @returns AttendeePublic Successful Response
+     * @throws ApiError
+     */
+    public static registerAttendee(data: EventsRegisterAttendeeData): CancelablePromise<EventsRegisterAttendeeResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/events/events/{event_id}/register',
+            path: {
+                event_id: data.eventId
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
 
 export class ItemsService {
     /**
@@ -138,6 +456,27 @@ export class LoginService {
     }
     
     /**
+     * Login Google
+     * Login with Google ID Token.
+     * Verifies the token with Google, creates a user if not exists, and returns a JWT.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns Token Successful Response
+     * @throws ApiError
+     */
+    public static loginGoogle(data: LoginLoginGoogleData): CancelablePromise<LoginLoginGoogleResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/login/google',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
      * Test Token
      * Test access token
      * @returns UserPublic Successful Response
@@ -242,6 +581,7 @@ export class UsersService {
      * @param data The data for the request.
      * @param data.skip
      * @param data.limit
+     * @param data.role
      * @returns UsersPublic Successful Response
      * @throws ApiError
      */
@@ -251,7 +591,8 @@ export class UsersService {
             url: '/api/v1/users/',
             query: {
                 skip: data.skip,
-                limit: data.limit
+                limit: data.limit,
+                role: data.role
             },
             errors: {
                 422: 'Validation Error'
@@ -357,6 +698,27 @@ export class UsersService {
         return __request(OpenAPI, {
             method: 'POST',
             url: '/api/v1/users/signup',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Users Bulk
+     * Update multiple users at once (Role, Church, Activation).
+     * Only Superuser or Admin can do this.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static updateUsersBulk(data: UsersUpdateUsersBulkData): CancelablePromise<UsersUpdateUsersBulkResponse> {
+        return __request(OpenAPI, {
+            method: 'PATCH',
+            url: '/api/v1/users/bulk',
             body: data.requestBody,
             mediaType: 'application/json',
             errors: {

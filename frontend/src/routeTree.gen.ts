@@ -16,8 +16,11 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
-import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
+import { Route as LayoutPermissionsRouteImport } from './routes/_layout/permissions'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as LayoutRegisterIndexRouteImport } from './routes/_layout/register/index'
+import { Route as LayoutEventsIndexRouteImport } from './routes/_layout/events/index'
+import { Route as LayoutEventsEventIdRouteImport } from './routes/_layout/events/$eventId'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -53,14 +56,29 @@ const LayoutSettingsRoute = LayoutSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => LayoutRoute,
 } as any)
-const LayoutItemsRoute = LayoutItemsRouteImport.update({
-  id: '/items',
-  path: '/items',
+const LayoutPermissionsRoute = LayoutPermissionsRouteImport.update({
+  id: '/permissions',
+  path: '/permissions',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutAdminRoute = LayoutAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutRegisterIndexRoute = LayoutRegisterIndexRouteImport.update({
+  id: '/register/',
+  path: '/register/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutEventsIndexRoute = LayoutEventsIndexRouteImport.update({
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutEventsEventIdRoute = LayoutEventsEventIdRouteImport.update({
+  id: '/events/$eventId',
+  path: '/events/$eventId',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -70,9 +88,12 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
-  '/items': typeof LayoutItemsRoute
+  '/permissions': typeof LayoutPermissionsRoute
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
+  '/events/$eventId': typeof LayoutEventsEventIdRoute
+  '/events': typeof LayoutEventsIndexRoute
+  '/register': typeof LayoutRegisterIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -80,9 +101,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
-  '/items': typeof LayoutItemsRoute
+  '/permissions': typeof LayoutPermissionsRoute
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
+  '/events/$eventId': typeof LayoutEventsEventIdRoute
+  '/events': typeof LayoutEventsIndexRoute
+  '/register': typeof LayoutRegisterIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -92,9 +116,12 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
   '/_layout/admin': typeof LayoutAdminRoute
-  '/_layout/items': typeof LayoutItemsRoute
+  '/_layout/permissions': typeof LayoutPermissionsRoute
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_layout/events/$eventId': typeof LayoutEventsEventIdRoute
+  '/_layout/events/': typeof LayoutEventsIndexRoute
+  '/_layout/register/': typeof LayoutRegisterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -104,9 +131,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/admin'
-    | '/items'
+    | '/permissions'
     | '/settings'
     | '/'
+    | '/events/$eventId'
+    | '/events'
+    | '/register'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -114,9 +144,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/admin'
-    | '/items'
+    | '/permissions'
     | '/settings'
     | '/'
+    | '/events/$eventId'
+    | '/events'
+    | '/register'
   id:
     | '__root__'
     | '/_layout'
@@ -125,9 +158,12 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/signup'
     | '/_layout/admin'
-    | '/_layout/items'
+    | '/_layout/permissions'
     | '/_layout/settings'
     | '/_layout/'
+    | '/_layout/events/$eventId'
+    | '/_layout/events/'
+    | '/_layout/register/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -189,11 +225,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSettingsRouteImport
       parentRoute: typeof LayoutRoute
     }
-    '/_layout/items': {
-      id: '/_layout/items'
-      path: '/items'
-      fullPath: '/items'
-      preLoaderRoute: typeof LayoutItemsRouteImport
+    '/_layout/permissions': {
+      id: '/_layout/permissions'
+      path: '/permissions'
+      fullPath: '/permissions'
+      preLoaderRoute: typeof LayoutPermissionsRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/admin': {
@@ -203,21 +239,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAdminRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/register/': {
+      id: '/_layout/register/'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof LayoutRegisterIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/events/': {
+      id: '/_layout/events/'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof LayoutEventsIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/events/$eventId': {
+      id: '/_layout/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof LayoutEventsEventIdRouteImport
+      parentRoute: typeof LayoutRoute
+    }
   }
 }
 
 interface LayoutRouteChildren {
   LayoutAdminRoute: typeof LayoutAdminRoute
-  LayoutItemsRoute: typeof LayoutItemsRoute
+  LayoutPermissionsRoute: typeof LayoutPermissionsRoute
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutEventsEventIdRoute: typeof LayoutEventsEventIdRoute
+  LayoutEventsIndexRoute: typeof LayoutEventsIndexRoute
+  LayoutRegisterIndexRoute: typeof LayoutRegisterIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAdminRoute: LayoutAdminRoute,
-  LayoutItemsRoute: LayoutItemsRoute,
+  LayoutPermissionsRoute: LayoutPermissionsRoute,
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,
+  LayoutEventsEventIdRoute: LayoutEventsEventIdRoute,
+  LayoutEventsIndexRoute: LayoutEventsIndexRoute,
+  LayoutRegisterIndexRoute: LayoutRegisterIndexRoute,
 }
 
 const LayoutRouteWithChildren =

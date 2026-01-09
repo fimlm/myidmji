@@ -2,7 +2,7 @@ import uuid
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import col, delete, func, select
+from sqlmodel import SQLModel, col, delete, func, select
 
 from app import crud
 from app.api.deps import (
@@ -20,6 +20,7 @@ from app.models import (
     UserCreate,
     UserPublic,
     UserRegister,
+    UserRole,
     UsersPublic,
     UserUpdate,
     UserUpdateMe,
@@ -34,15 +35,24 @@ router = APIRouter(prefix="/users", tags=["users"])
     dependencies=[Depends(get_current_active_superuser)],
     response_model=UsersPublic,
 )
-def read_users(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+def read_users(
+    session: SessionDep,
+    skip: int = 0,
+    limit: int = 100,
+    role: UserRole | None = None
+) -> Any:
     """
     Retrieve users.
     """
 
     count_statement = select(func.count()).select_from(User)
+    if role:
+        count_statement = count_statement.where(User.role == role)
     count = session.exec(count_statement).one()
 
     statement = select(User).offset(skip).limit(limit)
+    if role:
+        statement = statement.where(User.role == role)
     users = session.exec(statement).all()
 
     return UsersPublic(data=users, count=count)
@@ -122,7 +132,10 @@ def read_user_me(current_user: CurrentUser) -> Any:
     """
     Get current user.
     """
-    return current_user
+    user_public = UserPublic.model_validate(current_user)
+    if current_user.church:
+        user_public.church_name = current_user.church.name
+    return user_public
 
 
 @router.delete("/me", response_model=Message)
@@ -153,6 +166,49 @@ def register_user(session: SessionDep, user_in: UserRegister) -> Any:
     user_create = UserCreate.model_validate(user_in)
     user = crud.create_user(session=session, user_create=user_create)
     return user
+
+
+class UserBulkUpdate(SQLModel):
+    ids: list[uuid.UUID]
+    role: UserRole | None = None
+    church_id: uuid.UUID | None = None
+    is_active: bool | None = None
+
+
+# Helper function for authorization (assuming it's defined elsewhere or needs to be added)
+def check_admin(current_user: CurrentUser) -> None:
+    if not current_user.is_superuser:
+        raise HTTPException(
+            status_code=403,
+            detail="The user doesn't have enough privileges",
+        )
+
+@router.patch("/bulk")
+def update_users_bulk(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    data: UserBulkUpdate
+) -> Any:
+    """
+    Update multiple users at once (Role, Church, Activation).
+    Only Superuser or Admin can do this.
+    """
+    check_admin(current_user)
+
+    for user_id in data.ids:
+        user = session.get(User, user_id)
+        if user:
+            if data.role:
+                user.role = data.role
+            if data.church_id:
+                user.church_id = data.church_id
+            if data.is_active is not None:
+                user.is_active = data.is_active
+            session.add(user)
+
+    session.commit()
+    return {"message": "Users updated successfully"}
 
 
 @router.get("/{user_id}", response_model=UserPublic)
@@ -224,3 +280,6 @@ def delete_user(
     session.delete(user)
     session.commit()
     return Message(message="User deleted successfully")
+
+
+

@@ -1,0 +1,98 @@
+{
+  "login": {
+    "title": "Login to your account",
+    "description": "Enter your email below to login to your account",
+    "google": "Login with Google",
+    "or": "Or continue with email",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot your password?",
+    "loginButton": "Log In",
+    "signupPrompt": "Don't have an account yet?",
+    "signupLink": "Sign up"
+  },
+  "signup": {
+    "title": "Create an account",
+    "fullName": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signupButton": "Sign Up",
+    "loginPrompt": "Already have an account?",
+    "loginLink": "Log in"
+  },
+  "google": {
+    "signIn": "Sign in with Google"
+  },
+  "layout": {
+    "toggleLanguage": "Toggle language"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "permissions": "Roles & Permissions",
+    "events": "Events",
+    "register": "Registrar",
+    "admin": "Admin"
+  },
+  "dashboard": {
+    "greeting": "Hi, {{name}} 👋",
+    "welcome": "Welcome back, nice to see you again!!!",
+    "setup": {
+      "pendingTitle": "Pending Approval",
+      "pendingDesc": "You have selected your church. Please wait for an administrator to approve your role as a Digiter.",
+      "welcomeTitle": "Welcome! Let's get you set up",
+      "welcomeDesc": "Please select the event you are participating in and your church.",
+      "eventLabel": "1. Select Event",
+      "eventPlaceholder": "Select an event",
+      "churchLabel": "2. Select Church",
+      "churchPlaceholder": "Select your church",
+      "saveButton": "Start Digiting",
+      "savingButton": "Saving...",
+      "successToast": "Your profile has been updated. Waiting for admin approval.",
+      "errorToast": "Failed to update profile"
+    }
+  },
+  "registration": {
+    "title": "Registration",
+    "registeringFor": "Registering for: ",
+    "newAttendee": "New Attendee",
+    "attendeeDesc": "Enter the details of the person to register.",
+    "eventLabel": "Event",
+    "eventPlaceholder": "Select event...",
+    "searchPlaceholder": "Search event...",
+    "noEventFound": "No event found.",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "John Doe",
+    "documentId": "Document ID",
+    "documentIdPlaceholder": "123456789",
+    "registerButton": "Register Attendee",
+    "registering": "Registering...",
+    "loggedInAs": "Logged in as: ",
+    "successToast": "Attendee registered successfully",
+    "detailedSuccessToast": "Registered {{name}} from {{church}} for {{event}}",
+    "errorToast": "Registration failed",
+    "selectEventError": "Please select an event",
+    "loadingContext": "Loading context...",
+    "sessionLog": "Recent Registrations",
+    "noRecentRegistrations": "No recent registrations in this session.",
+    "noEventsFound": "No active events found for your church. Contact an administrator."
+  },
+  "common": {
+    "loading": "Loading..."
+  },
+  "settings": {
+    "profile": {
+      "infoTitle": "User Information",
+      "fullNameLabel": "Full name",
+      "emailLabel": "Email",
+      "invalidEmail": "Invalid email address",
+      "churchLabel": "Church",
+      "churchPlaceholder": "Select your church",
+      "notAvailable": "N/A",
+      "saveButton": "Save",
+      "cancelButton": "Cancel",
+      "editButton": "Edit",
+      "successToast": "User updated successfully"
+    }
+  }
+}

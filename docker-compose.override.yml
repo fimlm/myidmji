@@ -10,8 +10,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - "80:80"
-      - "8090:8080"
+      - "8010:80"
+      - "8013:8080"
     # Duplicate the command from docker-compose.yml to add --api.insecure=true
     command:
       # Enable Docker in Traefik, so that it reads labels from Docker services
@@ -48,17 +48,17 @@ services:
   db:
     restart: "no"
     ports:
-      - "5432:5432"
+      - "5434:5432"
 
   adminer:
     restart: "no"
     ports:
-      - "8080:8080"
+      - "8012:8080"
 
   backend:
     restart: "no"
     ports:
-      - "8000:8000"
+      - "8011:8000"
     build:
       context: ./backend
     # command: sleep infinity  # Infinite loop to keep container alive doing nothing
@@ -79,6 +79,8 @@ services:
           action: rebuild
     # TODO: remove once coverage is done locally
     volumes:
+      - ./backend:/app
+      - /app/.venv
       - ./backend/htmlcov:/app/htmlcov
     environment:
       SMTP_HOST: "mailcatcher"

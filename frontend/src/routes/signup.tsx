@@ -5,6 +5,7 @@ import {
   redirect,
 } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
+import { useTranslation } from "react-i18next"
 import { z } from "zod"
 import { AuthLayout } from "@/components/Common/AuthLayout"
 import {
@@ -51,13 +52,14 @@ export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
       {
-        title: "Sign Up - FastAPI Cloud",
+        title: "Sign Up - EventosMasivos",
       },
     ],
   }),
 })
 
 function SignUp() {
+  const { t } = useTranslation()
   const { signUpMutation } = useAuth()
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -87,7 +89,7 @@ function SignUp() {
           className="flex flex-col gap-6"
         >
           <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Create an account</h1>
+            <h1 className="text-2xl font-bold">{t("signup.title")}</h1>
           </div>
 
           <div className="grid gap-4">
@@ -96,7 +98,7 @@ function SignUp() {
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>{t("signup.fullName")}</FormLabel>
                   <FormControl>
                     <Input
                       data-testid="full-name-input"
@@ -115,7 +117,7 @@ function SignUp() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t("signup.email")}</FormLabel>
                   <FormControl>
                     <Input
                       data-testid="email-input"
@@ -134,11 +136,11 @@ function SignUp() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>{t("signup.password")}</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="password-input"
-                      placeholder="Password"
+                      placeholder={t("signup.password")}
                       {...field}
                     />
                   </FormControl>
@@ -152,11 +154,11 @@ function SignUp() {
               name="confirm_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>{t("signup.confirmPassword")}</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="confirm-password-input"
-                      placeholder="Confirm Password"
+                      placeholder={t("signup.confirmPassword")}
                       {...field}
                     />
                   </FormControl>
@@ -170,14 +172,14 @@ function SignUp() {
               className="w-full"
               loading={signUpMutation.isPending}
             >
-              Sign Up
+              {t("signup.signupButton")}
             </LoadingButton>
           </div>
 
           <div className="text-center text-sm">
-            Already have an account?{" "}
+            {t("signup.loginPrompt")}{" "}
             <RouterLink to="/login" className="underline underline-offset-4">
-              Log in
+              {t("signup.loginLink")}
             </RouterLink>
           </div>
         </form>

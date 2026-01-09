@@ -1,37 +1,56 @@
 import uuid
+from enum import Enum
+from typing import TYPE_CHECKING
 
 from pydantic import EmailStr
 from sqlmodel import Field, Relationship, SQLModel
 
+# Import generated models to ensure they are registered with SQLModel.metadata
+from .models_events import Church
+
+if TYPE_CHECKING:
+    from .models_events import Church
 
 # Shared properties
+class UserRole(str, Enum):
+    ADMIN = "admin"
+    SUPERVISOR = "supervisor"
+    DIGITER = "digiter"
+
+
 class UserBase(SQLModel):
     email: EmailStr = Field(unique=True, index=True, max_length=255)
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
+    role: UserRole = Field(default=UserRole.DIGITER)
 
 
 # Properties to receive via API on creation
 class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=128)
+    church_id: uuid.UUID | None = None
 
 
 class UserRegister(SQLModel):
     email: EmailStr = Field(max_length=255)
     password: str = Field(min_length=8, max_length=128)
     full_name: str | None = Field(default=None, max_length=255)
+    church_id: uuid.UUID | None = None
 
 
 # Properties to receive via API on update, all are optional
 class UserUpdate(UserBase):
     email: EmailStr | None = Field(default=None, max_length=255)  # type: ignore
     password: str | None = Field(default=None, min_length=8, max_length=128)
+    role: UserRole | None = None  # type: ignore
+    church_id: uuid.UUID | None = None
 
 
 class UserUpdateMe(SQLModel):
     full_name: str | None = Field(default=None, max_length=255)
     email: EmailStr | None = Field(default=None, max_length=255)
+    church_id: uuid.UUID | None = None
 
 
 class UpdatePassword(SQLModel):
@@ -45,10 +64,16 @@ class User(UserBase, table=True):
     hashed_password: str
     items: list["Item"] = Relationship(back_populates="owner", cascade_delete=True)
 
+    church_id: uuid.UUID | None = Field(default=None, foreign_key="church.id", nullable=True)
+
+    church: "Church" = Relationship(back_populates="users")
+
 
 # Properties to return via API, id is always required
 class UserPublic(UserBase):
     id: uuid.UUID
+    church_id: uuid.UUID | None = None
+    church_name: str | None = None
 
 
 class UsersPublic(SQLModel):

@@ -1,5 +1,6 @@
 import type { CapacitorConfig } from "@capacitor/cli"
 import dotenv from "dotenv"
+
 dotenv.config({ path: "../.env" })
 
 const config: CapacitorConfig = {

@@ -1,0 +1,98 @@
+{
+  "login": {
+    "title": "Inicie sesión en su cuenta",
+    "description": "Ingrese su correo electrónico a continuación para iniciar sesión en su cuenta",
+    "google": "Iniciar sesión con Google",
+    "or": "O continúe con el correo electrónico",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "loginButton": "Iniciar sesión",
+    "signupPrompt": "¿Aún no tienes una cuenta?",
+    "signupLink": "Regístrate"
+  },
+  "signup": {
+    "title": "Crea una cuenta",
+    "fullName": "Nombre completo",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "signupButton": "Registrarse",
+    "loginPrompt": "¿Ya tienes una cuenta?",
+    "loginLink": "Iniciar sesión"
+  },
+  "google": {
+    "signIn": "Iniciar sesión con Google"
+  },
+  "layout": {
+    "toggleLanguage": "Cambiar idioma"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "permissions": "Roles y Permisos",
+    "events": "Eventos",
+    "register": "Registrar",
+    "admin": "Admin"
+  },
+  "dashboard": {
+    "greeting": "Hola, {{name}} 👋",
+    "welcome": "¡Bienvenido de nuevo, qué gusto verte otra vez!",
+    "setup": {
+      "pendingTitle": "Aprobación Pendiente",
+      "pendingDesc": "Has seleccionado tu iglesia. Por favor, espera a que un administrador apruebe tu rol como Digitador.",
+      "welcomeTitle": "¡Bienvenido! Vamos a configurar tu cuenta",
+      "welcomeDesc": "Por favor, selecciona el evento en el que participas y tu iglesia.",
+      "eventLabel": "1. Seleccionar Evento",
+      "eventPlaceholder": "Selecciona un evento",
+      "churchLabel": "2. Seleccionar Iglesia",
+      "churchPlaceholder": "Selecciona tu iglesia",
+      "saveButton": "Empezar a Digitar",
+      "savingButton": "Guardando...",
+      "successToast": "Tu perfil ha sido actualizado. Esperando aprobación del administrador.",
+      "errorToast": "Error al actualizar el perfil"
+    }
+  },
+  "registration": {
+    "title": "Registro",
+    "registeringFor": "Registrando para: ",
+    "newAttendee": "Nuevo Asistente",
+    "attendeeDesc": "Ingresa los detalles de la persona a registrar.",
+    "eventLabel": "Evento",
+    "eventPlaceholder": "Seleccionar evento...",
+    "searchPlaceholder": "Buscar evento...",
+    "noEventFound": "No se encontró el evento.",
+    "fullName": "Nombre completo",
+    "fullNamePlaceholder": "Juan Pérez",
+    "documentId": "ID de Documento",
+    "documentIdPlaceholder": "123456789",
+    "registerButton": "Registrar Asistente",
+    "registering": "Registrando...",
+    "loggedInAs": "Iniciado como: ",
+    "successToast": "Asistente registrado con éxito",
+    "detailedSuccessToast": "Registrado {{name}} de {{church}} para {{event}}",
+    "errorToast": "Error al registrar asistente",
+    "selectEventError": "Por favor selecciona un evento",
+    "loadingContext": "Cargando contexto...",
+    "sessionLog": "Registros Recientes",
+    "noRecentRegistrations": "No hay registros recientes en esta sesión.",
+    "noEventsFound": "No se encontraron eventos activos para tu iglesia. Contacta a un administrador."
+  },
+  "common": {
+    "loading": "Cargando..."
+  },
+  "settings": {
+    "profile": {
+      "infoTitle": "Información del Usuario",
+      "fullNameLabel": "Nombre completo",
+      "emailLabel": "Correo electrónico",
+      "invalidEmail": "Correo electrónico inválido",
+      "churchLabel": "Iglesia",
+      "churchPlaceholder": "Selecciona tu iglesia",
+      "notAvailable": "N/D",
+      "saveButton": "Guardar",
+      "cancelButton": "Cancelar",
+      "editButton": "Editar",
+      "successToast": "Usuario actualizado con éxito"
+    }
+  }
+}

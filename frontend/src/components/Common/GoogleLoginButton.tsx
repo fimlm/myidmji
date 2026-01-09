@@ -3,26 +3,18 @@ import { GoogleAuth } from "@codetrix-studio/capacitor-google-auth"
 import { type CredentialResponse, GoogleLogin } from "@react-oauth/google"
 import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
-import axios from "axios"
+import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
+import { LoginService } from "@/client"
 import { Button } from "@/components/ui/button"
 
-// We define the type for the response we expect from our backend
-interface Token {
-  access_token: string
-  token_type: string
-}
-
 export function GoogleLoginButton() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const googleLoginMutation = useMutation({
     mutationFn: async (token: string) => {
-      // Manual call to backend since client is not regenerated yet
-      const response = await axios.post<Token>("/api/v1/login/google", {
-        token,
-      })
-      return response.data
+      return LoginService.loginGoogle({ requestBody: { token } })
     },
     onSuccess: (data) => {
       // Store token exactly like the standard login does
@@ -90,7 +82,7 @@ export function GoogleLoginButton() {
             />
           </g>
         </svg>
-        Sign in with Google
+        {t("google.signIn")}
       </Button>
     )
   }

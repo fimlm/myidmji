@@ -1,4 +1,5 @@
-import { Briefcase, Home, Users } from "lucide-react"
+import { Briefcase, Calendar, Home, Shield, Users } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 import { SidebarAppearance } from "@/components/Common/Appearance"
 import { Logo } from "@/components/Common/Logo"
@@ -12,17 +13,48 @@ import useAuth from "@/hooks/useAuth"
 import { type Item, Main } from "./Main"
 import { User } from "./User"
 
-const baseItems: Item[] = [
-  { icon: Home, title: "Dashboard", path: "/" },
-  { icon: Briefcase, title: "Items", path: "/items" },
-]
-
 export function AppSidebar() {
+  const { t } = useTranslation()
   const { user: currentUser } = useAuth()
 
-  const items = currentUser?.is_superuser
-    ? [...baseItems, { icon: Users, title: "Admin", path: "/admin" }]
-    : baseItems
+  // Items are moved inside component to support dynamic translation
+  const baseItems: Item[] = [
+    { icon: Home, title: t("sidebar.dashboard"), path: "/" },
+  ]
+
+  // Show Events for Admin/Supervisor or Superuser
+  const showEvents =
+    currentUser?.is_superuser ||
+    ["admin", "supervisor"].includes(currentUser?.role || "")
+
+  const items = [...baseItems]
+
+  if (currentUser?.is_superuser) {
+    items.push({
+      icon: Shield,
+      title: t("sidebar.permissions"),
+      path: "/permissions",
+    })
+  }
+
+  if (showEvents) {
+    items.push({ icon: Calendar, title: t("sidebar.events"), path: "/events" })
+  }
+
+  // Show Register for Digiter, Admin, or Supervisor
+  const canRegister =
+    currentUser?.is_superuser ||
+    ["admin", "supervisor", "digiter"].includes(currentUser?.role || "")
+  if (canRegister) {
+    items.push({ icon: Users, title: t("sidebar.register"), path: "/register" })
+  }
+
+  if (
+    currentUser?.is_superuser ||
+    ["admin"].includes(currentUser?.role || "")
+  ) {
+    items.push({ icon: Briefcase, title: t("sidebar.admin"), path: "/admin" })
+  }
 
   return (
     <Sidebar collapsible="icon">

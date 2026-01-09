@@ -2,6 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table"
 
 import type { UserPublic } from "@/client"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { UserActionsMenu } from "./UserActionsMenu"
 
@@ -10,6 +11,27 @@ export type UserTableData = UserPublic & {
 }
 
 export const columns: ColumnDef<UserTableData>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        onCheckedChange={(value: boolean) =>
+          table.toggleAllPageRowsSelected(!!value)
+        }
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value: boolean) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
   {
     accessorKey: "full_name",
     header: "Full Name",
@@ -45,6 +67,38 @@ export const columns: ColumnDef<UserTableData>[] = [
       <Badge variant={row.original.is_superuser ? "default" : "secondary"}>
         {row.original.is_superuser ? "Superuser" : "User"}
       </Badge>
+    ),
+  },
+  {
+    accessorKey: "role",
+    header: "System Role",
+    cell: ({ row }) => {
+      const role = row.original.role
+      return (
+        <Badge
+          variant={
+            role === "admin"
+              ? "default"
+              : role === "supervisor"
+                ? "secondary"
+                : "outline"
+          }
+        >
+          {role ? role.toUpperCase() : "N/A"}
+        </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: "church_id",
+    header: "Church ID",
+    cell: ({ row }) => (
+      <span
+        className="text-xs text-muted-foreground font-mono truncate max-w-[150px] block"
+        title={row.original.church_id || ""}
+      >
+        {row.original.church_id || "N/A"}
+      </span>
     ),
   },
   {
