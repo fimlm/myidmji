@@ -95,6 +95,18 @@ export const AttendeePublicSchema = {
                 }
             ],
             title: 'Event Name'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
         }
     },
     type: 'object',

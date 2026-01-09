@@ -20,6 +20,7 @@ export type AttendeePublic = {
     registered_by_email?: (string | null);
     church_name?: (string | null);
     event_name?: (string | null);
+    created_at?: (string | null);
 };
 
 export type Body_login_login_access_token = {

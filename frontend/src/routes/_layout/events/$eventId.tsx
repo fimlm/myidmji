@@ -305,7 +305,11 @@ function EventEditor() {
                         <TableCell className="text-muted-foreground text-sm">
                           {attendee.registered_by_email || "N/A"}
                         </TableCell>
-                        <TableCell>N/A</TableCell>
+                        <TableCell>
+                          {attendee.created_at
+                            ? new Date(attendee.created_at).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })
+                            : "N/A"}
+                        </TableCell>
                       </TableRow>
                     ))
                   ) : (

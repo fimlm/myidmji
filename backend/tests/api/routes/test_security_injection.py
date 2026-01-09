@@ -101,7 +101,7 @@ def test_idor_unauthorized_stats_access(
         json={"full_name": "Spy", "document_id": "999"}
     )
     assert r.status_code == 400
-    assert "not invited" in r.json()["detail"]
+    assert "CHURCH_NOT_INVITED" in r.json()["detail"]
 
     # 5. Try to access Stats (Supervisor role needed) -> SHOULD FAIL
     r = client.get(

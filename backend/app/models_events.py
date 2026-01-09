@@ -78,6 +78,7 @@ class Attendee(AttendeeBase, table=True):
     event_id: uuid.UUID = Field(foreign_key="event.id")
     church_id: uuid.UUID = Field(foreign_key="church.id")
     registered_by_id: uuid.UUID = Field(foreign_key="user.id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
     # Relationships
     event: Event = Relationship(back_populates="attendees")
@@ -94,3 +95,4 @@ class AttendeePublic(AttendeeBase):
     registered_by_email: str | None = None
     church_name: str | None = None
     event_name: str | None = None
+    created_at: datetime | None = None
