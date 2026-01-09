@@ -99,7 +99,10 @@
     "successDeleted": "Registration deleted and spot freed."
   },
   "common": {
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "search": "Search",
+    "id": "ID",
+    "error": "Error"
   },
   "settings": {
     "profile": {

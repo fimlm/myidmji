@@ -99,7 +99,10 @@
     "successDeleted": "Registro eliminado y cupo liberado."
   },
   "common": {
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "search": "Buscar",
+    "id": "Identificación",
+    "error": "Error"
   },
   "settings": {
     "profile": {

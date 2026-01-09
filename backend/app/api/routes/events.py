@@ -75,7 +75,7 @@ def create_event(
     *, session: SessionDep, current_user: CurrentUser, event_in: EventCreate
 ) -> Any:
     """Create new event."""
-    check_admin(current_user)
+    check_supervisor(current_user)
     event = Event.model_validate(event_in)
     session.add(event)
     session.commit()
@@ -103,7 +103,7 @@ def update_event(
     event_in: EventUpdate
 ) -> Any:
     """Update an event."""
-    check_admin(current_user)
+    check_supervisor(current_user)
     db_event = session.get(Event, event_id)
     if not db_event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -128,7 +128,7 @@ def invite_church_to_event(
     """
     Invite a church to an event and assign quota.
     """
-    check_admin(current_user)
+    check_supervisor(current_user)
     event = session.get(Event, event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -282,7 +282,7 @@ def get_event_digiters(
     """
     Get all digiters associated with churches invited to this event.
     """
-    check_admin(current_user)
+    check_supervisor(current_user)
 
     # 1. Get churches linked to this event
     links = session.exec(select(EventChurchLink).where(EventChurchLink.event_id == event_id)).all()
@@ -347,7 +347,7 @@ def invite_churches_bulk(
     """
     Invite multiple churches to an event with quotas.
     """
-    check_admin(current_user)
+    check_supervisor(current_user)
     event = session.get(Event, event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -386,7 +386,7 @@ def invite_churches_create_bulk(
     If church exists, use it. If not, create it.
     Then set quota.
     """
-    check_admin(current_user)
+    check_supervisor(current_user)
     event = session.get(Event, event_id)
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")

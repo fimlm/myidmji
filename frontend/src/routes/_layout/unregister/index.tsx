@@ -109,7 +109,7 @@ function Unregister() {
       queryClient.invalidateQueries({ queryKey: ["events"] }) // Update stats
     },
     onError: (err: any) => {
-      const errorMsg = err.body?.detail || "Failed to delete"
+      const errorMsg = err.body?.detail || t("common.error")
       toast.error(errorMsg)
     },
   })
@@ -215,7 +215,7 @@ function Unregister() {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3 className="text-lg font-bold">{searchedAttendee.full_name}</h3>
-                      <p className="text-sm text-muted-foreground">ID: {searchedAttendee.document_id}</p>
+                      <p className="text-sm text-muted-foreground">{t("common.id")}: {searchedAttendee.document_id}</p>
                       <p className="text-xs text-muted-foreground mt-1">
                         {searchedAttendee.church_name} • {searchedAttendee.event_name}
                       </p>
