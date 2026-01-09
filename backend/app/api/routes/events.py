@@ -436,15 +436,15 @@ def register_attendee(
         raise HTTPException(status_code=404, detail="Event not found")
 
     if not event.is_active:
-        raise HTTPException(status_code=400, detail="Event is not active")
+        raise HTTPException(status_code=400, detail="EVENT_NOT_ACTIVE")
 
     # Date Validation
     from datetime import datetime
     if event.max_registration_date and datetime.now() > event.max_registration_date:
-        raise HTTPException(status_code=400, detail="Event registration is closed")
+        raise HTTPException(status_code=400, detail="EVENT_REGISTRATION_CLOSED")
 
     if not current_user.church_id:
-        raise HTTPException(status_code=400, detail="User does not belong to any church")
+        raise HTTPException(status_code=400, detail="USER_NO_CHURCH")
 
     # Lock the Link row for update to prevent race conditions
     statement = select(EventChurchLink).where(
@@ -455,7 +455,7 @@ def register_attendee(
     link = session.exec(statement).first()
 
     if not link:
-        raise HTTPException(status_code=400, detail="Your church is not invited to this event")
+        raise HTTPException(status_code=400, detail="CHURCH_NOT_INVITED")
 
     # --- Global Quota Validation ---
      # Calculate current total registrations for this event across all churches
@@ -467,7 +467,7 @@ def register_attendee(
     if total_registered >= event.total_quota:
         raise HTTPException(
             status_code=400,
-            detail=f"Event total quota exceeded ({event.total_quota}). No more registrations allowed."
+            detail="EVENT_QUOTA_EXCEEDED"
         )
 
     # Note: We still use the link quota for reference, but we don't block registration
@@ -502,3 +502,100 @@ def register_attendee(
         res.church_name = church.name
 
     return res
+
+
+@router.get("/events/{event_id}/attendees/search", response_model=AttendeePublic)
+def search_attendee_by_document(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID,
+    document_id: str
+) -> Any:
+    """
+    Search for an attendee by document ID within a specific event.
+    Digiter can only search within their own church.
+    Admin/Supervisor can search globally (optional - for now sticking to strict logic).
+    """
+    check_digiter(current_user)
+
+    statement = select(Attendee).where(
+        Attendee.event_id == event_id,
+        Attendee.document_id == document_id
+    )
+
+    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [UserRole.ADMIN, UserRole.SUPERVISOR]
+    
+    if not is_admin_or_supervisor:
+        if not current_user.church_id:
+            raise HTTPException(status_code=403, detail="User not linked to a church")
+        statement = statement.where(Attendee.church_id == current_user.church_id)
+
+    attendee = session.exec(statement).first()
+    
+    if not attendee:
+        raise HTTPException(status_code=404, detail="Attendee not found")
+
+    # Hydrate additional fields
+    res = AttendeePublic.model_validate(attendee)
+    
+    # Get registered_by email
+    register_user = session.get(User, attendee.registered_by_id)
+    if register_user:
+        res.registered_by_email = register_user.email
+    
+    # Get Event Name
+    event = session.get(Event, event_id)
+    if event:
+        res.event_name = event.name
+        
+    # Get Church Name
+    church = session.get(Church, attendee.church_id)
+    if church:
+        res.church_name = church.name
+
+    return res
+
+
+@router.delete("/events/{event_id}/attendees/{attendee_id}", response_model=dict[str, str])
+def delete_attendee(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID,
+    attendee_id: uuid.UUID
+) -> Any:
+    """
+    Delete an attendee and restore quota.
+    """
+    check_digiter(current_user)
+
+    attendee = session.get(Attendee, attendee_id)
+    if not attendee:
+        raise HTTPException(status_code=404, detail="Attendee not found")
+
+    if attendee.event_id != event_id:
+        raise HTTPException(status_code=400, detail="Attendee does not belong to this event")
+
+    # Permission check: Digiter can only delete from their own church
+    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [UserRole.ADMIN, UserRole.SUPERVISOR]
+    if not is_admin_or_supervisor:
+         if attendee.church_id != current_user.church_id:
+             raise HTTPException(status_code=403, detail="Cannot delete attendee from another church")
+
+    # Lock EventChurchLink to update quota safely
+    link = session.exec(
+        select(EventChurchLink)
+        .where(EventChurchLink.event_id == event_id, EventChurchLink.church_id == attendee.church_id)
+        .with_for_update()
+    ).first()
+
+    if link:
+        if link.registered_count > 0:
+            link.registered_count -= 1
+            session.add(link)
+
+    session.delete(attendee)
+    session.commit()
+
+    return {"message": "Attendee deleted successfully and quota restored"}

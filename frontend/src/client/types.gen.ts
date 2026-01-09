@@ -70,6 +70,8 @@ export type EventCreate = {
      * Overall capacity of the event
      */
     total_quota?: number;
+    start_date?: (string | null);
+    end_date?: (string | null);
     /**
      * Deadline for registrations
      */
@@ -84,6 +86,8 @@ export type EventPublic = {
      * Overall capacity of the event
      */
     total_quota?: number;
+    start_date?: (string | null);
+    end_date?: (string | null);
     /**
      * Deadline for registrations
      */
@@ -104,6 +108,8 @@ export type EventUpdate = {
     name?: (string | null);
     description?: (string | null);
     total_quota?: (number | null);
+    start_date?: (string | null);
+    end_date?: (string | null);
     /**
      * Deadline for registrations
      */
@@ -320,6 +326,22 @@ export type EventsRegisterAttendeeData = {
 };
 
 export type EventsRegisterAttendeeResponse = (AttendeePublic);
+
+export type EventsSearchAttendeeByDocumentData = {
+    documentId: string;
+    eventId: string;
+};
+
+export type EventsSearchAttendeeByDocumentResponse = (AttendeePublic);
+
+export type EventsDeleteAttendeeData = {
+    attendeeId: string;
+    eventId: string;
+};
+
+export type EventsDeleteAttendeeResponse = ({
+    [key: string]: (string);
+});
 
 export type ItemsReadItemsData = {
     limit?: number;

@@ -32,7 +32,8 @@
     "permissions": "Roles & Permissions",
     "events": "Events",
     "register": "Registrar",
-    "admin": "Admin"
+    "admin": "Admin",
+    "unregister": "Unregister"
   },
   "dashboard": {
     "greeting": "Hi, {{name}} 👋",
@@ -75,7 +76,27 @@
     "loadingContext": "Loading context...",
     "sessionLog": "Recent Registrations",
     "noRecentRegistrations": "No recent registrations in this session.",
-    "noEventsFound": "No active events found for your church. Contact an administrator."
+    "noEventsFound": "No active events found for your church. Contact an administrator.",
+    "errors": {
+      "EVENT_NOT_ACTIVE": "The event is not currently active.",
+      "EVENT_REGISTRATION_CLOSED": "Registration for this event is closed.",
+      "USER_NO_CHURCH": "You are not assigned to any church.",
+      "CHURCH_NOT_INVITED": "Your church is not invited to this event.",
+      "EVENT_QUOTA_EXCEEDED": "We are sorry! The total quota for this event has been reached. No more registrations can be accepted."
+    }
+  },
+  "unregister": {
+    "title": "Unregister Attendee",
+    "desc": "Search for an attendee by ID to remove their registration and free up a spot.",
+    "searchExample": "Ex. 123456789",
+    "searchButton": "Search Attendee",
+    "searching": "Searching...",
+    "attendeeFound": "Attendee Found",
+    "confirmDelete": "Are you sure you want to delete this registration?",
+    "warning": "This action will free up the spot immediately.",
+    "deleteButton": "Delete Registration",
+    "deleting": "Deleting...",
+    "successDeleted": "Registration deleted and spot freed."
   },
   "common": {
     "loading": "Loading..."

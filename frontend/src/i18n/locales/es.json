@@ -32,7 +32,8 @@
     "permissions": "Roles y Permisos",
     "events": "Eventos",
     "register": "Registrar",
-    "admin": "Admin"
+    "admin": "Admin",
+    "unregister": "Eliminar Registro"
   },
   "dashboard": {
     "greeting": "Hola, {{name}} 👋",
@@ -75,7 +76,27 @@
     "loadingContext": "Cargando contexto...",
     "sessionLog": "Registros Recientes",
     "noRecentRegistrations": "No hay registros recientes en esta sesión.",
-    "noEventsFound": "No se encontraron eventos activos para tu iglesia. Contacta a un administrador."
+    "noEventsFound": "No se encontraron eventos activos para tu iglesia. Contacta a un administrador.",
+    "errors": {
+      "EVENT_NOT_ACTIVE": "El evento no está activo en este momento.",
+      "EVENT_REGISTRATION_CLOSED": "El periodo de registro para este evento ha finalizado.",
+      "USER_NO_CHURCH": "No tienes una iglesia asignada.",
+      "CHURCH_NOT_INVITED": "Tu iglesia no está invitada a este evento.",
+      "EVENT_QUOTA_EXCEEDED": "¡Lo sentimos! El cupo total para este evento se ha agotado. No se pueden recibir más registros."
+    }
+  },
+  "unregister": {
+    "title": "Eliminar Registro",
+    "desc": "Busca un asistente por identificación para eliminar su registro y liberar el cupo.",
+    "searchExample": "Ej. 123456789",
+    "searchButton": "Buscar Asistente",
+    "searching": "Buscando...",
+    "attendeeFound": "Asistente Encontrado",
+    "confirmDelete": "¿Estás seguro de eliminar este registro?",
+    "warning": "Esta acción liberará el cupo inmediatamente.",
+    "deleteButton": "Eliminar Registro",
+    "deleting": "Eliminando...",
+    "successDeleted": "Registro eliminado y cupo liberado."
   },
   "common": {
     "loading": "Cargando..."

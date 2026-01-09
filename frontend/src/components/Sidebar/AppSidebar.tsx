@@ -1,4 +1,4 @@
-import { Briefcase, Calendar, Home, Shield, Users } from "lucide-react"
+import { Briefcase, Calendar, Home, Shield, Users, UserX } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import { SidebarAppearance } from "@/components/Common/Appearance"
@@ -47,6 +47,7 @@ export function AppSidebar() {
     ["admin", "supervisor", "digiter"].includes(currentUser?.role || "")
   if (canRegister) {
     items.push({ icon: Users, title: t("sidebar.register"), path: "/register" })
+    items.push({ icon: UserX, title: t("sidebar.unregister"), path: "/unregister" })
   }
 
   if (

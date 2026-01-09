@@ -298,6 +298,30 @@ export const EventCreateSchema = {
             description: 'Overall capacity of the event',
             default: 0
         },
+        start_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Start Date'
+        },
+        end_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'End Date'
+        },
         max_registration_date: {
             anyOf: [
                 {
@@ -347,6 +371,30 @@ export const EventPublicSchema = {
             title: 'Total Quota',
             description: 'Overall capacity of the event',
             default: 0
+        },
+        start_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Start Date'
+        },
+        end_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'End Date'
         },
         max_registration_date: {
             anyOf: [
@@ -435,6 +483,30 @@ export const EventUpdateSchema = {
                 }
             ],
             title: 'Total Quota'
+        },
+        start_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Start Date'
+        },
+        end_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'End Date'
         },
         max_registration_date: {
             anyOf: [

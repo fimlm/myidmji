@@ -18,6 +18,7 @@ import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
 import { Route as LayoutPermissionsRouteImport } from './routes/_layout/permissions'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as LayoutUnregisterIndexRouteImport } from './routes/_layout/unregister/index'
 import { Route as LayoutRegisterIndexRouteImport } from './routes/_layout/register/index'
 import { Route as LayoutEventsIndexRouteImport } from './routes/_layout/events/index'
 import { Route as LayoutEventsEventIdRouteImport } from './routes/_layout/events/$eventId'
@@ -66,6 +67,11 @@ const LayoutAdminRoute = LayoutAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutUnregisterIndexRoute = LayoutUnregisterIndexRouteImport.update({
+  id: '/unregister/',
+  path: '/unregister/',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutRegisterIndexRoute = LayoutRegisterIndexRouteImport.update({
   id: '/register/',
   path: '/register/',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/events/$eventId': typeof LayoutEventsEventIdRoute
   '/events': typeof LayoutEventsIndexRoute
   '/register': typeof LayoutRegisterIndexRoute
+  '/unregister': typeof LayoutUnregisterIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -107,6 +114,7 @@ export interface FileRoutesByTo {
   '/events/$eventId': typeof LayoutEventsEventIdRoute
   '/events': typeof LayoutEventsIndexRoute
   '/register': typeof LayoutRegisterIndexRoute
+  '/unregister': typeof LayoutUnregisterIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -122,6 +130,7 @@ export interface FileRoutesById {
   '/_layout/events/$eventId': typeof LayoutEventsEventIdRoute
   '/_layout/events/': typeof LayoutEventsIndexRoute
   '/_layout/register/': typeof LayoutRegisterIndexRoute
+  '/_layout/unregister/': typeof LayoutUnregisterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -137,6 +146,7 @@ export interface FileRouteTypes {
     | '/events/$eventId'
     | '/events'
     | '/register'
+    | '/unregister'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -150,6 +160,7 @@ export interface FileRouteTypes {
     | '/events/$eventId'
     | '/events'
     | '/register'
+    | '/unregister'
   id:
     | '__root__'
     | '/_layout'
@@ -164,6 +175,7 @@ export interface FileRouteTypes {
     | '/_layout/events/$eventId'
     | '/_layout/events/'
     | '/_layout/register/'
+    | '/_layout/unregister/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -239,6 +251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAdminRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/unregister/': {
+      id: '/_layout/unregister/'
+      path: '/unregister'
+      fullPath: '/unregister'
+      preLoaderRoute: typeof LayoutUnregisterIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/register/': {
       id: '/_layout/register/'
       path: '/register'
@@ -271,6 +290,7 @@ interface LayoutRouteChildren {
   LayoutEventsEventIdRoute: typeof LayoutEventsEventIdRoute
   LayoutEventsIndexRoute: typeof LayoutEventsIndexRoute
   LayoutRegisterIndexRoute: typeof LayoutRegisterIndexRoute
+  LayoutUnregisterIndexRoute: typeof LayoutUnregisterIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
@@ -281,6 +301,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutEventsEventIdRoute: LayoutEventsEventIdRoute,
   LayoutEventsIndexRoute: LayoutEventsIndexRoute,
   LayoutRegisterIndexRoute: LayoutRegisterIndexRoute,
+  LayoutUnregisterIndexRoute: LayoutUnregisterIndexRoute,
 }
 
 const LayoutRouteWithChildren =

@@ -101,7 +101,7 @@ def test_register_attendee_global_quota(
         json={"full_name": "Attendee 3", "document_id": "789"}
     )
     assert r.status_code == 400
-    assert "Event total quota exceeded" in r.json()["detail"]
+    assert "EVENT_QUOTA_EXCEEDED" in r.json()["detail"]
 
 def test_register_attendee_ignore_church_quota(
     client: TestClient, db: Session
@@ -174,7 +174,7 @@ def test_register_attendee_inactive_event(
         json={"full_name": "Attendee 1", "document_id": "123"}
     )
     assert r.status_code == 400
-    assert "is not active" in r.json()["detail"]
+    assert "EVENT_NOT_ACTIVE" in r.json()["detail"]
 
 def test_get_event_attendees_isolation(
     client: TestClient, db: Session

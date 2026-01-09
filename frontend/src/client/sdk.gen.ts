@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { EventsCreateChurchData, EventsCreateChurchResponse, EventsReadChurchesData, EventsReadChurchesResponse, EventsCreateEventData, EventsCreateEventResponse, EventsReadEventsData, EventsReadEventsResponse, EventsUpdateEventData, EventsUpdateEventResponse, EventsInviteChurchToEventData, EventsInviteChurchToEventResponse, EventsGetEventChurchesData, EventsGetEventChurchesResponse, EventsGetEventStatsData, EventsGetEventStatsResponse, EventsGetEventAttendeesData, EventsGetEventAttendeesResponse, EventsGetEventDigitersData, EventsGetEventDigitersResponse, EventsGetMyEventsResponse, EventsInviteChurchesBulkData, EventsInviteChurchesBulkResponse, EventsInviteChurchesCreateBulkData, EventsInviteChurchesCreateBulkResponse, EventsRegisterAttendeeData, EventsRegisterAttendeeResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginLoginGoogleData, LoginLoginGoogleResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersUpdateUsersBulkData, UsersUpdateUsersBulkResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { EventsCreateChurchData, EventsCreateChurchResponse, EventsReadChurchesData, EventsReadChurchesResponse, EventsCreateEventData, EventsCreateEventResponse, EventsReadEventsData, EventsReadEventsResponse, EventsUpdateEventData, EventsUpdateEventResponse, EventsInviteChurchToEventData, EventsInviteChurchToEventResponse, EventsGetEventChurchesData, EventsGetEventChurchesResponse, EventsGetEventStatsData, EventsGetEventStatsResponse, EventsGetEventAttendeesData, EventsGetEventAttendeesResponse, EventsGetEventDigitersData, EventsGetEventDigitersResponse, EventsGetMyEventsResponse, EventsInviteChurchesBulkData, EventsInviteChurchesBulkResponse, EventsInviteChurchesCreateBulkData, EventsInviteChurchesCreateBulkResponse, EventsRegisterAttendeeData, EventsRegisterAttendeeResponse, EventsSearchAttendeeByDocumentData, EventsSearchAttendeeByDocumentResponse, EventsDeleteAttendeeData, EventsDeleteAttendeeResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginLoginGoogleData, LoginLoginGoogleResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersUpdateUsersBulkData, UsersUpdateUsersBulkResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
 
 export class EventsService {
     /**
@@ -316,6 +316,56 @@ export class EventsService {
             },
             body: data.requestBody,
             mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Search Attendee By Document
+     * Search for an attendee by document ID within a specific event.
+     * Digiter can only search within their own church.
+     * Admin/Supervisor can search globally (optional - for now sticking to strict logic).
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.documentId
+     * @returns AttendeePublic Successful Response
+     * @throws ApiError
+     */
+    public static searchAttendeeByDocument(data: EventsSearchAttendeeByDocumentData): CancelablePromise<EventsSearchAttendeeByDocumentResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/events/{event_id}/attendees/search',
+            path: {
+                event_id: data.eventId
+            },
+            query: {
+                document_id: data.documentId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Attendee
+     * Delete an attendee and restore quota.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.attendeeId
+     * @returns string Successful Response
+     * @throws ApiError
+     */
+    public static deleteAttendee(data: EventsDeleteAttendeeData): CancelablePromise<EventsDeleteAttendeeResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/events/events/{event_id}/attendees/{attendee_id}',
+            path: {
+                event_id: data.eventId,
+                attendee_id: data.attendeeId
+            },
             errors: {
                 422: 'Validation Error'
             }

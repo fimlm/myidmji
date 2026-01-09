@@ -138,7 +138,17 @@ function Register() {
       if (docInput) docInput.focus()
     },
     onError: (err: any) => {
-      showErrorToast(err.body?.detail || t("registration.errorToast"))
+      const detail = err.body?.detail
+      // Try to translate the error code
+      const translationKey = `registration.errors.${detail}`
+      const translatedError = t(translationKey)
+
+      // If translation exists (doesn't match key) use it, otherwise use detail or fallback
+      const message = translatedError !== translationKey
+        ? translatedError
+        : (detail || t("registration.errorToast"))
+
+      showErrorToast(message)
     },
   })
 
