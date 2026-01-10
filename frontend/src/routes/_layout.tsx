@@ -9,6 +9,9 @@ import {
 } from "@/components/ui/sidebar"
 import { isLoggedIn } from "@/hooks/useAuth"
 
+import { useNavigate } from "@tanstack/react-router"
+import { useEffect } from "react"
+
 export const Route = createFileRoute("/_layout")({
   component: Layout,
   beforeLoad: async () => {
@@ -21,6 +24,25 @@ export const Route = createFileRoute("/_layout")({
 })
 
 function Layout() {
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Reactive check for token presence
+    const checkAuth = () => {
+      if (!isLoggedIn()) {
+        navigate({ to: "/login" })
+      }
+    }
+
+    // Listen for manual token removal or storage changes
+    window.addEventListener("storage", checkAuth)
+    const interval = setInterval(checkAuth, 2000) // Polling as fallback
+
+    return () => {
+      window.removeEventListener("storage", checkAuth)
+      clearInterval(interval)
+    }
+  }, [navigate])
   return (
     <SidebarProvider>
       <AppSidebar />

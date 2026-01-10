@@ -60,7 +60,7 @@ export class EventsService {
     public static createEvent(data: EventsCreateEventData): CancelablePromise<EventsCreateEventResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/events/events',
+            url: '/api/v1/events',
             body: data.requestBody,
             mediaType: 'application/json',
             errors: {
@@ -81,7 +81,7 @@ export class EventsService {
     public static readEvents(data: EventsReadEventsData = {}): CancelablePromise<EventsReadEventsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/events/events',
+            url: '/api/v1/events',
             query: {
                 skip: data.skip,
                 limit: data.limit
@@ -129,7 +129,7 @@ export class EventsService {
     public static inviteChurchToEvent(data: EventsInviteChurchToEventData): CancelablePromise<EventsInviteChurchToEventResponse> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/api/v1/events/events/{event_id}/invite',
+            url: '/api/v1/events/{event_id}/invite',
             path: {
                 event_id: data.eventId
             },
@@ -155,7 +155,7 @@ export class EventsService {
     public static getEventChurches(data: EventsGetEventChurchesData): CancelablePromise<EventsGetEventChurchesResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/events/events/{event_id}/churches',
+            url: '/api/v1/events/{event_id}/churches',
             path: {
                 event_id: data.eventId
             },
@@ -176,7 +176,7 @@ export class EventsService {
     public static getEventStats(data: EventsGetEventStatsData): CancelablePromise<EventsGetEventStatsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/events/events/{event_id}/stats',
+            url: '/api/v1/events/{event_id}/stats',
             path: {
                 event_id: data.eventId
             },
@@ -199,7 +199,7 @@ export class EventsService {
     public static getEventAttendees(data: EventsGetEventAttendeesData): CancelablePromise<EventsGetEventAttendeesResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/events/events/{event_id}/attendees',
+            url: '/api/v1/events/{event_id}/attendees',
             path: {
                 event_id: data.eventId
             },
@@ -224,7 +224,7 @@ export class EventsService {
     public static getEventDigiters(data: EventsGetEventDigitersData): CancelablePromise<EventsGetEventDigitersResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/events/events/{event_id}/digiters',
+            url: '/api/v1/events/{event_id}/digiters',
             path: {
                 event_id: data.eventId
             },
@@ -259,7 +259,7 @@ export class EventsService {
     public static inviteChurchesBulk(data: EventsInviteChurchesBulkData): CancelablePromise<EventsInviteChurchesBulkResponse> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/api/v1/events/events/{event_id}/invite-bulk',
+            url: '/api/v1/events/{event_id}/invite-bulk',
             path: {
                 event_id: data.eventId
             },
@@ -285,7 +285,7 @@ export class EventsService {
     public static inviteChurchesCreateBulk(data: EventsInviteChurchesCreateBulkData): CancelablePromise<EventsInviteChurchesCreateBulkResponse> {
         return __request(OpenAPI, {
             method: 'PUT',
-            url: '/api/v1/events/events/{event_id}/invite-create-bulk',
+            url: '/api/v1/events/{event_id}/invite-create-bulk',
             path: {
                 event_id: data.eventId
             },
@@ -310,7 +310,7 @@ export class EventsService {
     public static registerAttendee(data: EventsRegisterAttendeeData): CancelablePromise<EventsRegisterAttendeeResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/events/events/{event_id}/register',
+            url: '/api/v1/events/{event_id}/register',
             path: {
                 event_id: data.eventId
             },
@@ -336,7 +336,7 @@ export class EventsService {
     public static searchAttendeeByDocument(data: EventsSearchAttendeeByDocumentData): CancelablePromise<EventsSearchAttendeeByDocumentResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/events/events/{event_id}/attendees/search',
+            url: '/api/v1/events/{event_id}/attendees/search',
             path: {
                 event_id: data.eventId
             },
@@ -361,7 +361,7 @@ export class EventsService {
     public static deleteAttendee(data: EventsDeleteAttendeeData): CancelablePromise<EventsDeleteAttendeeResponse> {
         return __request(OpenAPI, {
             method: 'DELETE',
-            url: '/api/v1/events/events/{event_id}/attendees/{attendee_id}',
+            url: '/api/v1/events/{event_id}/attendees/{attendee_id}',
             path: {
                 event_id: data.eventId,
                 attendee_id: data.attendeeId

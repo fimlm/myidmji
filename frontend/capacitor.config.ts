@@ -4,8 +4,8 @@ import dotenv from "dotenv"
 dotenv.config({ path: "../.env" })
 
 const config: CapacitorConfig = {
-  appId: "com.fullstack.app",
-  appName: "Full Stack App",
+  appId: "org.idmji.myidmji",
+  appName: "MyIDMJI",
   webDir: "dist",
   plugins: {
     GoogleAuth: {

@@ -83,7 +83,7 @@ def create_event(
     return event
 
 
-@router.get("/events", response_model=list[EventPublic])
+@router.get("/", response_model=list[EventPublic])
 def read_events(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
@@ -115,7 +115,7 @@ def update_event(
     return db_event
 
 
-@router.put("/events/{event_id}/invite", response_model=EventPublic)
+@router.put("/{event_id}/invite", response_model=EventPublic)
 def invite_church_to_event(
     *,
     session: SessionDep,
@@ -150,7 +150,7 @@ def invite_church_to_event(
     return event
 
 
-@router.get("/events/{event_id}/churches", response_model=ChurchesPublic)
+@router.get("/{event_id}/churches", response_model=ChurchesPublic)
 def get_event_churches(
     *,
     session: SessionDep,
@@ -182,7 +182,7 @@ class EventStats(SQLModel):
     total_registered: int
     church_stats: list[dict[str, Any]]
 
-@router.get("/events/{event_id}/stats", response_model=EventStats)
+@router.get("/{event_id}/stats", response_model=EventStats)
 def get_event_stats(
     *,
     session: SessionDep,
@@ -226,7 +226,7 @@ def get_event_stats(
     )
 
 
-@router.get("/events/{event_id}/attendees", response_model=list[AttendeePublic])
+@router.get("/{event_id}/attendees", response_model=list[AttendeePublic])
 def get_event_attendees(
     *,
     session: SessionDep,
@@ -270,7 +270,7 @@ def get_event_attendees(
     return results
 
 
-@router.get("/events/{event_id}/digiters", response_model=list[UserPublic])
+@router.get("/{event_id}/digiters", response_model=list[UserPublic])
 def get_event_digiters(
     *,
     session: SessionDep,
@@ -334,7 +334,7 @@ class BulkInviteRequest(SQLModel):
     invites: list[ChurchInvite]
 
 
-@router.put("/events/{event_id}/invite-bulk")
+@router.put("/{event_id}/invite-bulk")
 def invite_churches_bulk(
     *,
     session: SessionDep,
@@ -371,7 +371,7 @@ class ChurchInviteCreate(SQLModel):
 class BulkInviteCreateRequest(SQLModel):
     invites: list[ChurchInviteCreate]
 
-@router.put("/events/{event_id}/invite-create-bulk")
+@router.put("/{event_id}/invite-create-bulk")
 def invite_churches_create_bulk(
     *,
     session: SessionDep,
@@ -412,7 +412,7 @@ def invite_churches_create_bulk(
     return {"message": "Bulk invites processed successfully"}
 
 # --- Attendees (Digiter) ---
-@router.post("/events/{event_id}/register", response_model=AttendeePublic)
+@router.post("/{event_id}/register", response_model=AttendeePublic)
 def register_attendee(
     *,
     session: SessionDep,
@@ -502,7 +502,7 @@ def register_attendee(
     return res
 
 
-@router.get("/events/{event_id}/attendees/search", response_model=AttendeePublic)
+@router.get("/{event_id}/attendees/search", response_model=AttendeePublic)
 def search_attendee_by_document(
     *,
     session: SessionDep,
@@ -555,7 +555,7 @@ def search_attendee_by_document(
     return res
 
 
-@router.delete("/events/{event_id}/attendees/{attendee_id}", response_model=dict[str, str])
+@router.delete("/{event_id}/attendees/{attendee_id}", response_model=dict[str, str])
 def delete_attendee(
     *,
     session: SessionDep,

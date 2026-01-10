@@ -27,18 +27,18 @@ export default defineConfig({
         enabled: true,
       },
       manifest: {
-        name: "Full Stack FastAPI App",
-        short_name: "FastAPI App",
-        description: "Full Stack FastAPI React Application",
+        name: "MyIDMJI",
+        short_name: "MyIDMJI",
+        description: "App IDMJI",
         theme_color: "#ffffff",
         icons: [
           {
-            src: "pwa-192x192.png",
+            src: "/assets/images/register-logo.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "pwa-512x512.png",
+            src: "/assets/images/register-logo.png",
             sizes: "512x512",
             type: "image/png",
           },
