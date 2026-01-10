@@ -60,7 +60,7 @@ export class EventsService {
     public static createEvent(data: EventsCreateEventData): CancelablePromise<EventsCreateEventResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/events',
+            url: '/api/v1/events/',
             body: data.requestBody,
             mediaType: 'application/json',
             errors: {
@@ -81,7 +81,7 @@ export class EventsService {
     public static readEvents(data: EventsReadEventsData = {}): CancelablePromise<EventsReadEventsResponse> {
         return __request(OpenAPI, {
             method: 'GET',
-            url: '/api/v1/events',
+            url: '/api/v1/events/',
             query: {
                 skip: data.skip,
                 limit: data.limit
@@ -146,7 +146,7 @@ export class EventsService {
     /**
      * Get Event Churches
      * Get all churches invited to this event.
-     * Accessible to all digiters (needed for onboarding).
+     * Accessible to all logged in users (needed for onboarding).
      * @param data The data for the request.
      * @param data.eventId
      * @returns ChurchesPublic Successful Response

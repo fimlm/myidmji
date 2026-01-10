@@ -70,7 +70,7 @@ def read_churches(
 
 
 # --- Events (Admin) ---
-@router.post("/events", response_model=EventPublic)
+@router.post("/", response_model=EventPublic)
 def create_event(
     *, session: SessionDep, current_user: CurrentUser, event_in: EventCreate
 ) -> Any:
