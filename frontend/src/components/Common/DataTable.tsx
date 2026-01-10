@@ -13,7 +13,7 @@ import {
   ChevronsRight,
   Search,
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -49,6 +49,16 @@ export function DataTable<TData, TValue>({
   renderToolbar,
 }: DataTableProps<TData, TValue>) {
   const [globalFilter, setGlobalFilter] = useState("")
+  const [searchTerm, setSearchTerm] = useState("")
+
+  // Update global filter with debounce
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setGlobalFilter(searchTerm)
+    }, 300)
+
+    return () => clearTimeout(timeout)
+  }, [searchTerm])
 
   const table = useReactTable({
     data,
@@ -78,8 +88,8 @@ export function DataTable<TData, TValue>({
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search..."
-            value={globalFilter ?? ""}
-            onChange={(event) => table.setGlobalFilter(event.target.value)}
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
             className="pl-8"
           />
         </div>

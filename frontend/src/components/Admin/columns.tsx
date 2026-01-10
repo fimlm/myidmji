@@ -130,7 +130,7 @@ export const columns: ColumnDef<UserTableData>[] = [
   },
   {
     accessorKey: "church_id",
-    header: "Church ID",
+    header: ({ column }) => sortableHeader(column, "Church ID"),
     cell: ({ row }) => (
       <span
         className="text-xs text-muted-foreground font-mono truncate max-w-[150px] block"
