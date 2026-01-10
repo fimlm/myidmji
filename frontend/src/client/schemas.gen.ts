@@ -863,6 +863,16 @@ export const UserCreateSchema = {
             '$ref': '#/components/schemas/UserRole',
             default: 'USER'
         },
+        is_google_account: {
+            type: 'boolean',
+            title: 'Is Google Account',
+            default: false
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
+        },
         password: {
             type: 'string',
             maxLength: 128,
@@ -920,6 +930,16 @@ export const UserPublicSchema = {
         role: {
             '$ref': '#/components/schemas/UserRole',
             default: 'USER'
+        },
+        is_google_account: {
+            type: 'boolean',
+            title: 'Is Google Account',
+            default: false
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
         },
         id: {
             type: 'string',
@@ -992,6 +1012,17 @@ export const UserRegisterSchema = {
                 }
             ],
             title: 'Church Id'
+        },
+        recaptcha_token: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Recaptcha Token'
         }
     },
     type: 'object',
@@ -1051,6 +1082,16 @@ export const UserUpdateSchema = {
                     type: 'null'
                 }
             ]
+        },
+        is_google_account: {
+            type: 'boolean',
+            title: 'Is Google Account',
+            default: false
+        },
+        created_at: {
+            type: 'string',
+            format: 'date-time',
+            title: 'Created At'
         },
         password: {
             anyOf: [

@@ -96,7 +96,7 @@ def test_idor_unauthorized_stats_access(
 
     # 4. Try to register for Event Y (Not invited) -> SHOULD FAIL
     r = client.post(
-        f"{settings.API_V1_STR}/events/events/{event_y.id}/register",
+        f"{settings.API_V1_STR}/events/{event_y.id}/register",
         headers=headers,
         json={"full_name": "Spy", "document_id": "999"}
     )
@@ -105,7 +105,7 @@ def test_idor_unauthorized_stats_access(
 
     # 5. Try to access Stats (Supervisor role needed) -> SHOULD FAIL
     r = client.get(
-        f"{settings.API_V1_STR}/events/events/{event_x.id}/stats",
+        f"{settings.API_V1_STR}/events/{event_x.id}/stats",
         headers=headers,
     )
     assert r.status_code == 403 # Forbidden

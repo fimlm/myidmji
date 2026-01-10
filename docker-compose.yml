@@ -103,6 +103,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD?Variable not set}
       - SENTRY_DSN=${SENTRY_DSN}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_RECAPTCHA_SECRET=${GOOGLE_RECAPTCHA_SECRET}
 
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/utils/health-check/"]
@@ -133,6 +134,7 @@ services:
         - VITE_API_URL=https://${DOMAIN?Variable not set}
         - NODE_ENV=production
         - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
+        - VITE_GOOGLE_RECAPTCHA_KEY=${VITE_GOOGLE_RECAPTCHA_KEY}
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public

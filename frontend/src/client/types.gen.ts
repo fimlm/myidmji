@@ -187,6 +187,8 @@ export type UserCreate = {
     is_superuser?: boolean;
     full_name?: (string | null);
     role?: UserRole;
+    is_google_account?: boolean;
+    created_at?: string;
     password: string;
     church_id?: (string | null);
 };
@@ -197,6 +199,8 @@ export type UserPublic = {
     is_superuser?: boolean;
     full_name?: (string | null);
     role?: UserRole;
+    is_google_account?: boolean;
+    created_at?: string;
     id: string;
     church_id?: (string | null);
     church_name?: (string | null);
@@ -207,6 +211,7 @@ export type UserRegister = {
     password: string;
     full_name?: (string | null);
     church_id?: (string | null);
+    recaptcha_token?: (string | null);
 };
 
 export type UserRole = 'ADMIN' | 'SUPERVISOR' | 'DIGITER' | 'USER';
@@ -222,6 +227,8 @@ export type UserUpdate = {
     is_superuser?: boolean;
     full_name?: (string | null);
     role?: (UserRole | null);
+    is_google_account?: boolean;
+    created_at?: string;
     password?: (string | null);
     church_id?: (string | null);
 };

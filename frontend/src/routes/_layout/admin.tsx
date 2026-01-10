@@ -12,7 +12,10 @@ import { columns, type UserTableData } from "@/components/Admin/columns"
 import { DataTable } from "@/components/Common/DataTable"
 import PendingUsers from "@/components/Pending/PendingUsers"
 import { Button } from "@/components/ui/button"
+import { DataTableFacetedFilter } from "@/components/ui/data-table-faceted-filter"
 import useAuth from "@/hooks/useAuth"
+import { Mail } from "lucide-react"
+import { FaGoogle } from "react-icons/fa"
 import useCustomToast from "@/hooks/useCustomToast"
 
 function getUsersQueryOptions() {
@@ -144,6 +147,20 @@ function UsersTableContent() {
         data={tableData}
         rowSelection={rowSelection}
         setRowSelection={setRowSelection}
+        renderToolbar={(table) => (
+          <div className="flex items-center gap-2">
+            {table.getColumn("is_google_account") && (
+              <DataTableFacetedFilter
+                column={table.getColumn("is_google_account")}
+                title="Provider"
+                options={[
+                  { label: "Google", value: "true", icon: FaGoogle },
+                  { label: "Email", value: "false", icon: Mail },
+                ]}
+              />
+            )}
+          </div>
+        )}
       />
     </div>
   )

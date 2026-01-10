@@ -13,4 +13,4 @@ docker network create traefik-public 2>/dev/null || true
 
 docker compose -f docker-compose.yml -f docker-compose.traefik.yml up -d --build --remove-orphans
 
-echo "✅ ¡Actualización completada! El sitio debería estar en línea en unos segundos."
+echo "✅ ¡Actualización completada!"

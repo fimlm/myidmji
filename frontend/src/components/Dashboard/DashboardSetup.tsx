@@ -44,7 +44,7 @@ export function DashboardSetup() {
     queryKey: ["eventChurches", selectedEventId],
     queryFn: () =>
       EventsService.getEventChurches({ eventId: selectedEventId! }),
-    enabled: !!selectedEventId,
+    enabled: !!selectedEventId && selectedEventId !== "undefined" && selectedEventId !== "null",
   })
 
   const mutation = useMutation({

@@ -50,6 +50,7 @@ class Settings(BaseSettings):
 
     PROJECT_NAME: str
     GOOGLE_CLIENT_ID: str | None = None
+    GOOGLE_RECAPTCHA_SECRET: str | None = None
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str
     POSTGRES_PORT: int = 5432

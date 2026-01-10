@@ -90,7 +90,19 @@ def read_events(
     """Retrieve events."""
     statement = select(Event).offset(skip).limit(limit)
     events = session.exec(statement).all()
+    events = session.exec(statement).all()
     return events
+
+
+@router.get("/{event_id}", response_model=EventPublic)
+def read_event(
+    *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
+) -> Any:
+    """Get event by ID."""
+    event = session.get(Event, event_id)
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return event
 
 
 @router.patch("/{event_id}", response_model=EventPublic)

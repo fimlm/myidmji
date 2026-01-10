@@ -25,7 +25,7 @@ from app.models import (
     UserUpdate,
     UserUpdateMe,
 )
-from app.utils import generate_new_account_email, send_email
+from app.utils import generate_new_account_email, send_email, verify_recaptcha
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -50,7 +50,7 @@ def read_users(
         count_statement = count_statement.where(User.role == role)
     count = session.exec(count_statement).one()
 
-    statement = select(User).offset(skip).limit(limit)
+    statement = select(User).order_by(User.created_at.desc()).offset(skip).limit(limit)
     if role:
         statement = statement.where(User.role == role)
     users = session.exec(statement).all()
@@ -157,6 +157,14 @@ def register_user(session: SessionDep, user_in: UserRegister) -> Any:
     """
     Create new user without the need to be logged in.
     """
+    if settings.GOOGLE_RECAPTCHA_SECRET:
+        if not user_in.recaptcha_token:
+            raise HTTPException(status_code=400, detail="Missing reCAPTCHA token")
+        
+        score = verify_recaptcha(user_in.recaptcha_token)
+        if score is None or score < 0.5:
+             raise HTTPException(status_code=400, detail="reCAPTCHA validation failed")
+
     user = crud.get_user_by_email(session=session, email=user_in.email)
     if user:
         raise HTTPException(

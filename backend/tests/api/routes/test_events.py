@@ -29,7 +29,7 @@ def test_create_event(
 ) -> None:
     data = {"name": "Test Event", "total_quota": 100, "description": "Bla bla"}
     r = client.post(
-        f"{settings.API_V1_STR}/events/events",
+        f"{settings.API_V1_STR}/events",
         headers=superuser_token_headers,
         json=data,
     )
@@ -80,7 +80,7 @@ def test_register_attendee_global_quota(
 
     # 5. Register 1st attendee - SUCCESS
     r = client.post(
-        f"{settings.API_V1_STR}/events/events/{event.id}/register",
+        f"{settings.API_V1_STR}/events/{event.id}/register",
         headers=headers,
         json={"full_name": "Attendee 1", "document_id": "123"}
     )
@@ -88,7 +88,7 @@ def test_register_attendee_global_quota(
 
     # 6. Register 2nd attendee - SUCCESS
     r = client.post(
-        f"{settings.API_V1_STR}/events/events/{event.id}/register",
+        f"{settings.API_V1_STR}/events/{event.id}/register",
         headers=headers,
         json={"full_name": "Attendee 2", "document_id": "456"}
     )
@@ -96,7 +96,7 @@ def test_register_attendee_global_quota(
 
     # 7. Register 3rd attendee - FAIL (Global Quota Exceeded)
     r = client.post(
-        f"{settings.API_V1_STR}/events/events/{event.id}/register",
+        f"{settings.API_V1_STR}/events/{event.id}/register",
         headers=headers,
         json={"full_name": "Attendee 3", "document_id": "789"}
     )
@@ -127,7 +127,7 @@ def test_register_attendee_ignore_church_quota(
 
     # 5. Register 1st attendee - SUCCESS
     r = client.post(
-        f"{settings.API_V1_STR}/events/events/{event.id}/register",
+        f"{settings.API_V1_STR}/events/{event.id}/register",
         headers=headers,
         json={"full_name": "Attendee 1", "document_id": "123"}
     )
@@ -135,7 +135,7 @@ def test_register_attendee_ignore_church_quota(
 
     # 6. Register 2nd attendee - SUCCESS (Should ignore church quota of 1)
     r = client.post(
-        f"{settings.API_V1_STR}/events/events/{event.id}/register",
+        f"{settings.API_V1_STR}/events/{event.id}/register",
         headers=headers,
         json={"full_name": "Attendee 2", "document_id": "456"}
     )
@@ -169,7 +169,7 @@ def test_register_attendee_inactive_event(
 
     # 5. Register - FAIL (Event is not active)
     r = client.post(
-        f"{settings.API_V1_STR}/events/events/{event.id}/register",
+        f"{settings.API_V1_STR}/events/{event.id}/register",
         headers=headers,
         json={"full_name": "Attendee 1", "document_id": "123"}
     )
@@ -209,7 +209,7 @@ def test_get_event_attendees_isolation(
 
     # 8. Get attendees - SHOULD ONLY SEE Church A's attendee
     r = client.get(
-        f"{settings.API_V1_STR}/events/events/{event.id}/attendees",
+        f"{settings.API_V1_STR}/events/{event.id}/attendees",
         headers=headers,
     )
     assert r.status_code == 200
@@ -220,7 +220,7 @@ def test_get_event_attendees_isolation(
     # 9. Get attendees as SUPERUSER - SHOULD SEE ALL
     superuser_token_headers = {"Authorization": f"Bearer {client.post(f'{settings.API_V1_STR}/login/access-token', data={'username': settings.FIRST_SUPERUSER, 'password': settings.FIRST_SUPERUSER_PASSWORD}).json()['access_token']}"}
     r = client.get(
-        f"{settings.API_V1_STR}/events/events/{event.id}/attendees",
+        f"{settings.API_V1_STR}/events/{event.id}/attendees",
         headers=superuser_token_headers,
     )
     assert r.status_code == 200

@@ -34,6 +34,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[]
   rowSelection?: Record<string, boolean>
   setRowSelection?: (selection: Record<string, boolean>) => void
+  renderToolbar?: (table: import("@tanstack/react-table").Table<TData>) => React.ReactNode
 }
 
 export function DataTable<TData, TValue>({
@@ -41,6 +42,7 @@ export function DataTable<TData, TValue>({
   data,
   rowSelection,
   setRowSelection,
+  renderToolbar,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -56,6 +58,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="flex flex-col gap-4">
+      {renderToolbar && renderToolbar(table)}
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -66,9 +69,9 @@ export function DataTable<TData, TValue>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 )
               })}
@@ -110,7 +113,7 @@ export function DataTable<TData, TValue>({
               to{" "}
               {Math.min(
                 (table.getState().pagination.pageIndex + 1) *
-                  table.getState().pagination.pageSize,
+                table.getState().pagination.pageSize,
                 data.length,
               )}{" "}
               of{" "}

@@ -121,3 +121,35 @@ def verify_password_reset_token(token: str) -> str | None:
         return str(decoded_token["sub"])
     except InvalidTokenError:
         return None
+
+
+def verify_recaptcha(token: str) -> float | None:
+    """
+    Verifies the Google reCAPTCHA v3 token.
+    Returns the score (0.0 - 1.0) if valid, or None if verification failed.
+    """
+    if not settings.GOOGLE_RECAPTCHA_SECRET:
+        # If no secret is configured, we skip verification (dev mode or opt-out)
+        return 1.0
+
+    import requests
+
+    try:
+        response = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={
+                "secret": settings.GOOGLE_RECAPTCHA_SECRET,
+                "response": token,
+            },
+            timeout=10,
+        )
+        result = response.json()
+        
+        if result.get("success"):
+            return float(result.get("score", 0.0))
+        
+        logger.warning(f"reCAPTCHA verification failed: {result}")
+        return None
+    except Exception as e:
+        logger.error(f"reCAPTCHA connection error: {e}")
+        return None

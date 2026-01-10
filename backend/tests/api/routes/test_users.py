@@ -286,11 +286,17 @@ def test_register_user(client: TestClient, db: Session) -> None:
     username = random_email()
     password = random_lower_string()
     full_name = random_lower_string()
-    data = {"email": username, "password": password, "full_name": full_name}
-    r = client.post(
-        f"{settings.API_V1_STR}/users/signup",
-        json=data,
-    )
+    data = {
+        "email": username, 
+        "password": password, 
+        "full_name": full_name,
+        "recaptcha_token": "valid_token"
+    }
+    with patch("app.api.routes.users.verify_recaptcha", return_value=1.0):
+        r = client.post(
+            f"{settings.API_V1_STR}/users/signup",
+            json=data,
+        )
     assert r.status_code == 200
     created_user = r.json()
     assert created_user["email"] == username
@@ -311,11 +317,13 @@ def test_register_user_already_exists_error(client: TestClient) -> None:
         "email": settings.FIRST_SUPERUSER,
         "password": password,
         "full_name": full_name,
+        "recaptcha_token": "valid_token"
     }
-    r = client.post(
-        f"{settings.API_V1_STR}/users/signup",
-        json=data,
-    )
+    with patch("app.api.routes.users.verify_recaptcha", return_value=1.0):
+        r = client.post(
+            f"{settings.API_V1_STR}/users/signup",
+            json=data,
+        )
     assert r.status_code == 400
     assert r.json()["detail"] == "The user with this email already exists in the system"
 

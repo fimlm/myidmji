@@ -58,9 +58,26 @@ export const Route = createFileRoute("/signup")({
   }),
 })
 
+import { GoogleReCaptchaProvider, useGoogleReCaptcha } from "react-google-recaptcha-v3"
+// ... imports
+
 function SignUp() {
+  const recaptchaKey = import.meta.env.VITE_GOOGLE_RECAPTCHA_KEY
+  return (
+    <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+      <SignUpContent />
+    </GoogleReCaptchaProvider>
+  )
+}
+
+function SignUpContent() {
   const { t } = useTranslation()
   const { signUpMutation } = useAuth()
+  const { executeRecaptcha } = useGoogleReCaptcha()
+
+  // Pre-fetch token on mount or when needed (optional, or just on submit)
+  // v3 tokens expire, so better to execute on action or shortly before.
+
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     mode: "onBlur",
@@ -73,12 +90,17 @@ function SignUp() {
     },
   })
 
-  const onSubmit = (data: FormData) => {
+  const onSubmit = async (data: FormData) => {
     if (signUpMutation.isPending) return
+
+    let recaptchaToken = ""
+    if (executeRecaptcha) {
+      recaptchaToken = await executeRecaptcha("signup")
+    }
 
     // exclude confirm_password from submission data
     const { confirm_password: _confirm_password, ...submitData } = data
-    signUpMutation.mutate(submitData)
+    signUpMutation.mutate({ ...submitData, recaptcha_token: recaptchaToken })
   }
 
   return (
@@ -88,6 +110,7 @@ function SignUp() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-6"
         >
+          {/* ... rest of the form ... */}
           <div className="flex flex-col items-center gap-2 text-center">
             <h1 className="text-2xl font-bold">{t("signup.title")}</h1>
           </div>

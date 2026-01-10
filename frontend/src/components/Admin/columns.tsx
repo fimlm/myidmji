@@ -6,11 +6,50 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
 import { UserActionsMenu } from "./UserActionsMenu"
 
+import { ArrowUpDown, Mail } from "lucide-react"
+import { FaGoogle } from "react-icons/fa"
+import { Button } from "@/components/ui/button"
+
 export type UserTableData = UserPublic & {
   isCurrentUser: boolean
 }
 
+const sortableHeader = (column: any, title: string) => {
+  return (
+    <Button
+      variant="ghost"
+      onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+    >
+      {title}
+      <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+  )
+}
+
 export const columns: ColumnDef<UserTableData>[] = [
+  {
+    accessorKey: "is_google_account",
+    header: "Provider",
+    cell: ({ row }) => {
+      const isGoogle = row.original.is_google_account
+      return (
+        <div className="flex items-center">
+          {isGoogle ? (
+            <FaGoogle className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" title="Google" />
+          ) : (
+            <span title="Email">
+              <Mail className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors" />
+            </span>
+          )}
+        </div>
+      )
+    },
+    enableSorting: false,
+    enableHiding: false,
+    filterFn: (row, id, value) => {
+      return value.includes(String(row.getValue(id)))
+    },
+  },
   {
     id: "select",
     header: ({ table }) => (
@@ -34,7 +73,7 @@ export const columns: ColumnDef<UserTableData>[] = [
   },
   {
     accessorKey: "full_name",
-    header: "Full Name",
+    header: ({ column }) => sortableHeader(column, "Full Name"),
     cell: ({ row }) => {
       const fullName = row.original.full_name
       return (
@@ -55,14 +94,14 @@ export const columns: ColumnDef<UserTableData>[] = [
   },
   {
     accessorKey: "email",
-    header: "Email",
+    header: ({ column }) => sortableHeader(column, "Email"),
     cell: ({ row }) => (
       <span className="text-muted-foreground">{row.original.email}</span>
     ),
   },
   {
     accessorKey: "is_superuser",
-    header: "Role",
+    header: ({ column }) => sortableHeader(column, "Role"),
     cell: ({ row }) => (
       <Badge variant={row.original.is_superuser ? "default" : "secondary"}>
         {row.original.is_superuser ? "Superuser" : "User"}
@@ -71,7 +110,7 @@ export const columns: ColumnDef<UserTableData>[] = [
   },
   {
     accessorKey: "role",
-    header: "System Role",
+    header: ({ column }) => sortableHeader(column, "System Role"),
     cell: ({ row }) => {
       const role = row.original.role
       return (
@@ -100,6 +139,19 @@ export const columns: ColumnDef<UserTableData>[] = [
         {row.original.church_id || "N/A"}
       </span>
     ),
+  },
+  {
+    accessorKey: "created_at",
+    header: ({ column }) => sortableHeader(column, "Registered At"),
+    cell: ({ row }) => {
+      if (!row.original.created_at) return <span className="text-muted-foreground text-sm">-</span>
+      const date = new Date(row.original.created_at)
+      return (
+        <span className="text-muted-foreground text-sm">
+          {date.toLocaleString()}
+        </span>
+      )
+    },
   },
   {
     accessorKey: "is_active",

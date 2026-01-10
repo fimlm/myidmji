@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
@@ -25,6 +26,8 @@ class UserBase(SQLModel):
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
     role: UserRole = Field(default=UserRole.USER)
+    is_google_account: bool = Field(default=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
 # Properties to receive via API on creation
@@ -38,6 +41,7 @@ class UserRegister(SQLModel):
     password: str = Field(min_length=8, max_length=128)
     full_name: str | None = Field(default=None, max_length=255)
     church_id: uuid.UUID | None = None
+    recaptcha_token: str | None = None
 
 
 # Properties to receive via API on update, all are optional

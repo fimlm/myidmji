@@ -72,7 +72,8 @@ def login_google(token_data: TokenGoogle, session: SessionDep) -> Token:
                 email=email,
                 password=password,
                 full_name=id_info.get("name"),
-                is_active=True
+                is_active=True,
+                is_google_account=True,
             )
             user = crud.create_user(session=session, user_create=user_in)
 
