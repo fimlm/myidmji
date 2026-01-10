@@ -43,6 +43,7 @@ import {
 import useAuth from "@/hooks/useAuth"
 import useCustomToast from "@/hooks/useCustomToast"
 import { cn } from "@/lib/utils"
+import { PrivacyPolicyModal } from "@/components/Common/PrivacyPolicyModal"
 
 export const Route = createFileRoute("/_layout/register/")({
   component: Register,
@@ -314,6 +315,15 @@ function Register() {
                     ? t("registration.registering")
                     : t("registration.registerButton")}
                 </Button>
+                <div className="text-center text-xs text-muted-foreground mt-2">
+                  {t("common.privacyPolicyRegistrationAgreement")}
+                  <PrivacyPolicyModal>
+                    <button type="button" className="underline underline-offset-4 hover:text-primary">
+                      {t("common.privacyPolicyLink")}
+                    </button>
+                  </PrivacyPolicyModal>
+                  .
+                </div>
               </form>
             </Form>
           )}

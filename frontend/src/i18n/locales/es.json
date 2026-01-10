@@ -130,7 +130,10 @@
       "Inactive user": "Usuario inactivo. Por favor contacte a un administrador.",
       "The user with this email does not exist in the system": "El usuario con este correo no existe.",
       "Invalid token": "Token inválido o expirado."
-    }
+    },
+    "privacyPolicyAgreement": "Al iniciar sesión, aceptas nuestra ",
+    "privacyPolicyRegistrationAgreement": "Al registrarse, aceptas nuestra ",
+    "privacyPolicyLink": "Política de Privacidad"
   },
   "settings": {
     "profile": {

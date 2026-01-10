@@ -53,6 +53,7 @@ export function DashboardSetup() {
     onSuccess: () => {
       showSuccessToast(t("dashboard.setup.successToast"))
       queryClient.invalidateQueries({ queryKey: ["currentUser"] })
+      queryClient.invalidateQueries({ queryKey: ["myEvents"] })
     },
     onError: (err: any) => {
       showErrorToast(err.body?.detail || t("dashboard.setup.errorToast"))

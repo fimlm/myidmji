@@ -94,6 +94,32 @@ def read_events(
     return events
 
 
+@router.get("/my-events", response_model=list[EventPublic])
+def get_my_events(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+) -> Any:
+    """
+    Get all active events that the current user's church is invited to.
+    """
+    if not current_user.church_id:
+        return []
+
+    # Get all active events where this church has a link
+    statement = (
+        select(Event)
+        .join(EventChurchLink)
+        .where(
+            EventChurchLink.church_id == current_user.church_id,
+            Event.is_active == True
+        )
+    )
+
+    events = session.exec(statement).all()
+    return events
+
+
 @router.get("/{event_id}", response_model=EventPublic)
 def read_event(
     *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
@@ -311,30 +337,6 @@ def get_event_digiters(
     return digiters
 
 
-@router.get("/my-events", response_model=list[EventPublic])
-def get_my_events(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-) -> Any:
-    """
-    Get all active events that the current user's church is invited to.
-    """
-    if not current_user.church_id:
-        return []
-
-    # Get all active events where this church has a link
-    statement = (
-        select(Event)
-        .join(EventChurchLink)
-        .where(
-            EventChurchLink.church_id == current_user.church_id,
-            Event.is_active == True
-        )
-    )
-
-    events = session.exec(statement).all()
-    return events
 
 
 # --- Extras ---

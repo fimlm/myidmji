@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
 import useAuth, { isLoggedIn } from "@/hooks/useAuth"
+import { PrivacyPolicyModal } from "@/components/Common/PrivacyPolicyModal"
 
 const formSchema = z
   .object({
@@ -204,6 +205,15 @@ function SignUpContent() {
             <RouterLink to="/login" className="underline underline-offset-4">
               {t("signup.loginLink")}
             </RouterLink>
+          </div>
+          <div className="text-center text-sm text-muted-foreground mt-4">
+            {t("common.privacyPolicyAgreement")}
+            <PrivacyPolicyModal>
+              <button type="button" className="underline underline-offset-4 hover:text-primary">
+                {t("common.privacyPolicyLink")}
+              </button>
+            </PrivacyPolicyModal>
+            .
           </div>
         </form>
       </Form>
