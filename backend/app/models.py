@@ -13,9 +13,10 @@ if TYPE_CHECKING:
 
 # Shared properties
 class UserRole(str, Enum):
-    ADMIN = "admin"
-    SUPERVISOR = "supervisor"
-    DIGITER = "digiter"
+    ADMIN = "ADMIN"
+    SUPERVISOR = "SUPERVISOR"
+    DIGITER = "DIGITER"
+    USER = "USER"
 
 
 class UserBase(SQLModel):
@@ -23,7 +24,7 @@ class UserBase(SQLModel):
     is_active: bool = True
     is_superuser: bool = False
     full_name: str | None = Field(default=None, max_length=255)
-    role: UserRole = Field(default=UserRole.DIGITER)
+    role: UserRole = Field(default=UserRole.USER)
 
 
 # Properties to receive via API on creation

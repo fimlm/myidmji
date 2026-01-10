@@ -120,7 +120,7 @@ export const Body_login_login_access_tokenSchema = {
             anyOf: [
                 {
                     type: 'string',
-                    pattern: 'password'
+                    pattern: '^password$'
                 },
                 {
                     type: 'null'
@@ -134,6 +134,7 @@ export const Body_login_login_access_tokenSchema = {
         },
         password: {
             type: 'string',
+            format: 'password',
             title: 'Password'
         },
         scope: {
@@ -161,6 +162,7 @@ export const Body_login_login_access_tokenSchema = {
                     type: 'null'
                 }
             ],
+            format: 'password',
             title: 'Client Secret'
         }
     },
@@ -861,7 +863,7 @@ export const UserCreateSchema = {
         },
         role: {
             '$ref': '#/components/schemas/UserRole',
-            default: 'digiter'
+            default: 'USER'
         },
         password: {
             type: 'string',
@@ -919,7 +921,7 @@ export const UserPublicSchema = {
         },
         role: {
             '$ref': '#/components/schemas/UserRole',
-            default: 'digiter'
+            default: 'USER'
         },
         id: {
             type: 'string',
@@ -1001,7 +1003,7 @@ export const UserRegisterSchema = {
 
 export const UserRoleSchema = {
     type: 'string',
-    enum: ['admin', 'supervisor', 'digiter'],
+    enum: ['ADMIN', 'SUPERVISOR', 'DIGITER', 'USER'],
     title: 'UserRole'
 } as const;
 

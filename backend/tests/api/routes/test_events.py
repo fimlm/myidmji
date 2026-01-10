@@ -3,7 +3,7 @@ from sqlmodel import Session
 
 from app import crud
 from app.core.config import settings
-from app.models import UserCreate
+from app.models import UserCreate, UserRole
 from app.models_events import Attendee, Church, Event, EventChurchLink
 from tests.utils.utils import random_email, random_lower_string
 
@@ -61,7 +61,7 @@ def test_register_attendee_global_quota(
 ) -> None:
     # 1. Setup Church and User
     church = create_random_church(db)
-    user_in = UserCreate(email=random_email(), password=random_lower_string(), full_name="Test User", church_id=church.id)
+    user_in = UserCreate(email=random_email(), password=random_lower_string(), full_name="Test User", church_id=church.id, role=UserRole.DIGITER)
     user = crud.create_user(session=db, user_create=user_in)
 
     # 2. Setup Event with small quota
@@ -108,7 +108,7 @@ def test_register_attendee_ignore_church_quota(
 ) -> None:
     # 1. Setup Church and User
     church = create_random_church(db)
-    user_in = UserCreate(email=random_email(), password=random_lower_string(), full_name="Test User", church_id=church.id)
+    user_in = UserCreate(email=random_email(), password=random_lower_string(), full_name="Test User", church_id=church.id, role=UserRole.DIGITER)
     user = crud.create_user(session=db, user_create=user_in)
 
     # 2. Setup Event with larger quota
@@ -147,7 +147,7 @@ def test_register_attendee_inactive_event(
 ) -> None:
     # 1. Setup Church and User
     church = create_random_church(db)
-    user_in = UserCreate(email=random_email(), password=random_lower_string(), full_name="Test User", church_id=church.id)
+    user_in = UserCreate(email=random_email(), password=random_lower_string(), full_name="Test User", church_id=church.id, role=UserRole.DIGITER)
     user = crud.create_user(session=db, user_create=user_in)
 
     # 2. Setup Inactive Event
@@ -181,7 +181,7 @@ def test_get_event_attendees_isolation(
 ) -> None:
     # 1. Setup Church A and User A (Digiter)
     church_a = create_random_church(db)
-    user_a_in = UserCreate(email=random_email(), password=random_lower_string(), full_name="User A", church_id=church_a.id)
+    user_a_in = UserCreate(email=random_email(), password="password", full_name="User A", church_id=church_a.id, role=UserRole.DIGITER)
     user_a = crud.create_user(session=db, user_create=user_a_in)
 
     # 2. Setup Church B

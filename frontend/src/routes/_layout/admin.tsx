@@ -41,12 +41,12 @@ function Admin() {
 
   // Redirect if not admin
   useEffect(() => {
-    if (user && !user.is_superuser && user.role !== "admin") {
+    if (user && !user.is_superuser && user.role !== "ADMIN") {
       navigate({ to: "/" })
     }
   }, [user, navigate])
 
-  if (user && !user.is_superuser && user.role !== "admin") {
+  if (user && !user.is_superuser && user.role !== "ADMIN") {
     return null
   }
 
@@ -127,9 +127,16 @@ function UsersTableContent() {
         <Button
           variant="secondary"
           disabled={!hasSelection || bulkMutation.isPending}
-          onClick={() => bulkMutation.mutate({ role: "digiter" })}
+          onClick={() => bulkMutation.mutate({ role: "DIGITER" })}
         >
           Promote to Digiter
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={!hasSelection || bulkMutation.isPending}
+          onClick={() => bulkMutation.mutate({ role: "SUPERVISOR" })}
+        >
+          Promote to Supervisor
         </Button>
       </div>
       <DataTable

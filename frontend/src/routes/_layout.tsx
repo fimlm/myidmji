@@ -1,6 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 
-import { Footer } from "@/components/Common/Footer"
 import { LanguageSwitcher } from "@/components/Common/LanguageSwitcher"
 import AppSidebar from "@/components/Sidebar/AppSidebar"
 import {
@@ -26,7 +25,7 @@ function Layout() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <header className="flex h-16 shrink-0 items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1 text-muted-foreground" />
           <div className="ml-auto flex items-center gap-2">
             <LanguageSwitcher />
@@ -37,7 +36,6 @@ function Layout() {
             <Outlet />
           </div>
         </main>
-        <Footer />
       </SidebarInset>
     </SidebarProvider>
   )

@@ -1,15 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { AlertCircle, Search, Trash2, UserX } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { useTranslation } from "react-i18next"
-import { toast } from "sonner"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { EventsService, type AttendeePublic } from "@/client"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import useAuth from "@/hooks/useAuth"
+import useCustomToast from "@/hooks/useCustomToast"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -45,8 +46,22 @@ const SearchSchema = z.object({
 
 function Unregister() {
   const { t } = useTranslation()
+  const { user: currentUser } = useAuth()
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { showSuccessToast, showErrorToast } = useCustomToast()
   const [searchedAttendee, setSearchedAttendee] = useState<AttendeePublic | null>(null)
+
+  // Redirect if not digiter/admin/supervisor
+  useEffect(() => {
+    if (
+      currentUser &&
+      !currentUser.is_superuser &&
+      !["ADMIN", "SUPERVISOR", "DIGITER"].includes(currentUser.role || "")
+    ) {
+      navigate({ to: "/" })
+    }
+  }, [currentUser, navigate])
 
   // 1. Get Events (Reuse similar logic to Register page)
   const { data: events, isLoading: isLoadingEvents } = useQuery({
@@ -84,12 +99,12 @@ function Unregister() {
     },
     onSuccess: (data) => {
       setSearchedAttendee(data)
-      toast.success(t("unregister.attendeeFound"))
+      showSuccessToast(t("unregister.attendeeFound"))
     },
     onError: (err: any) => {
       setSearchedAttendee(null)
-      const errorMsg = err.body?.detail || t("common.error")
-      toast.error(errorMsg)
+      const detail = err.body?.detail
+      showErrorToast(detail || t("common.error"))
     },
   })
 
@@ -103,20 +118,20 @@ function Unregister() {
       })
     },
     onSuccess: () => {
-      toast.success(t("unregister.successDeleted"))
+      showSuccessToast(t("unregister.successDeleted"))
       setSearchedAttendee(null)
       form.reset()
       queryClient.invalidateQueries({ queryKey: ["events"] }) // Update stats
     },
     onError: (err: any) => {
-      const errorMsg = err.body?.detail || t("common.error")
-      toast.error(errorMsg)
+      const detail = err.body?.detail
+      showErrorToast(detail || t("common.error"))
     },
   })
 
   const onSearch = (data: z.infer<typeof SearchSchema>) => {
     if (!selectedEventId) {
-      toast.error(t("registration.selectEventError"))
+      showErrorToast(t("registration.selectEventError"))
       return
     }
     searchMutation.mutate(data)
@@ -126,6 +141,14 @@ function Unregister() {
     if (searchedAttendee) {
       deleteMutation.mutate(searchedAttendee.id)
     }
+  }
+
+  if (
+    currentUser &&
+    !currentUser.is_superuser &&
+    !["ADMIN", "SUPERVISOR", "DIGITER"].includes(currentUser.role || "")
+  ) {
+    return null
   }
 
   return (

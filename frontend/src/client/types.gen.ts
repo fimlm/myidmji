@@ -209,7 +209,7 @@ export type UserRegister = {
     church_id?: (string | null);
 };
 
-export type UserRole = 'admin' | 'supervisor' | 'digiter';
+export type UserRole = 'ADMIN' | 'SUPERVISOR' | 'DIGITER' | 'USER';
 
 export type UsersPublic = {
     data: Array<UserPublic>;

@@ -51,6 +51,21 @@
       "savingButton": "Guardando...",
       "successToast": "Tu perfil ha sido actualizado. Esperando aprobación del administrador.",
       "errorToast": "Error al actualizar el perfil"
+    },
+    "pendingBanner": {
+      "title": "¡Casi listo, {{name}}!",
+      "message": "Tu cuenta está en proceso de revisión. Una vez que un administrador apruebe tu rol de Digitador, podrás acceder a todas las herramientas de registro.",
+      "waiting": "Esperando activación..."
+    },
+    "actions": {
+      "registerTitle": "Registrar Asistente",
+      "registerDesc": "Añade nuevos participantes a tus eventos activos.",
+      "unregisterTitle": "Eliminar Registro",
+      "unregisterDesc": "Anula un registro y libera cupo usando la identificación.",
+      "eventsTitle": "Gestionar Eventos",
+      "eventsDesc": "Configura cupos, fechas y visibilidad de eventos.",
+      "adminTitle": "Panel de Control",
+      "adminDesc": "Administra usuarios, aprueba roles y gestiona permisos."
     }
   },
   "registration": {
@@ -96,13 +111,26 @@
     "warning": "Esta acción liberará el cupo inmediatamente.",
     "deleteButton": "Eliminar Registro",
     "deleting": "Eliminando...",
-    "successDeleted": "Registro eliminado y cupo liberado."
+    "successDeleted": "Registro eliminado y cupo liberado.",
+    "errors": {
+      "Attendee not found": "Asistente no encontrado en este evento.",
+      "Cannot delete attendee from another church": "No puedes eliminar un asistente de otra iglesia.",
+      "Attendee does not belong to this event": "El asistente no pertenece a este evento."
+    }
   },
   "common": {
     "loading": "Cargando...",
     "search": "Buscar",
     "id": "Identificación",
-    "error": "Error"
+    "error": "Error",
+    "success": "¡Éxito!",
+    "errorTitle": "¡Algo salió mal!",
+    "errors": {
+      "Incorrect email or password": "Correo electrónico o contraseña incorrectos",
+      "Inactive user": "Usuario inactivo. Por favor contacte a un administrador.",
+      "The user with this email does not exist in the system": "El usuario con este correo no existe.",
+      "Invalid token": "Token inválido o expirado."
+    }
   },
   "settings": {
     "profile": {

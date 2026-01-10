@@ -46,7 +46,7 @@ function PermissionsManager() {
         // Let's just use the `limit` increased to 1000 for this view to ensure we see everyone.
         const response = await UsersService.readUsers({ limit: 1000 })
         return response.data.filter((u) =>
-          ["supervisor", "digiter", "admin"].includes(u.role || ""),
+          ["SUPERVISOR", "DIGITER", "ADMIN"].includes(u.role || ""),
         )
       }
       return (await UsersService.readUsers({ limit: 1000 })).data
@@ -59,9 +59,9 @@ function PermissionsManager() {
 
   const tableData: UserTableData[] = users
     ? users.map((user) => ({
-        ...user,
-        isCurrentUser: currentUser?.id === user.id,
-      }))
+      ...user,
+      isCurrentUser: currentUser?.id === user.id,
+    }))
     : []
 
   return (

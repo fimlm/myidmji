@@ -51,6 +51,21 @@
       "savingButton": "Saving...",
       "successToast": "Your profile has been updated. Waiting for admin approval.",
       "errorToast": "Failed to update profile"
+    },
+    "pendingBanner": {
+      "title": "Almost ready, {{name}}!",
+      "message": "Your account is under review. Once an administrator approves your Digiter role, you'll be able to access all registration tools.",
+      "waiting": "Awaiting activation..."
+    },
+    "actions": {
+      "registerTitle": "Register Attendee",
+      "registerDesc": "Add new participants to your active events.",
+      "unregisterTitle": "Remove Registration",
+      "unregisterDesc": "Cancel a registration and free up a spot using ID.",
+      "eventsTitle": "Manage Events",
+      "eventsDesc": "Configure quotas, dates, and event visibility.",
+      "adminTitle": "Admin Dashboard",
+      "adminDesc": "Manage users, approve roles, and handle permissions."
     }
   },
   "registration": {
@@ -96,13 +111,26 @@
     "warning": "This action will free up the spot immediately.",
     "deleteButton": "Delete Registration",
     "deleting": "Deleting...",
-    "successDeleted": "Registration deleted and spot freed."
+    "successDeleted": "Registration deleted and spot freed.",
+    "errors": {
+      "Attendee not found": "Attendee not found in this event.",
+      "Cannot delete attendee from another church": "You cannot delete an attendee from another church.",
+      "Attendee does not belong to this event": "The attendee does not belong to this event."
+    }
   },
   "common": {
     "loading": "Loading...",
     "search": "Search",
     "id": "ID",
-    "error": "Error"
+    "error": "Error",
+    "success": "Success!",
+    "errorTitle": "Something went wrong!",
+    "errors": {
+      "Incorrect email or password": "Incorrect email or password",
+      "Inactive user": "Inactive user. Please contact an administrator.",
+      "The user with this email does not exist in the system": "User with this email does not exist.",
+      "Invalid token": "Invalid or expired token."
+    }
   },
   "settings": {
     "profile": {

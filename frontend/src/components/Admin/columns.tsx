@@ -77,9 +77,9 @@ export const columns: ColumnDef<UserTableData>[] = [
       return (
         <Badge
           variant={
-            role === "admin"
+            role === "ADMIN"
               ? "default"
-              : role === "supervisor"
+              : role === "SUPERVISOR" || role === "DIGITER"
                 ? "secondary"
                 : "outline"
           }

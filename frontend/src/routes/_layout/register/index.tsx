@@ -71,7 +71,7 @@ function Register() {
     if (
       currentUser &&
       !currentUser.is_superuser &&
-      !["admin", "supervisor", "digiter"].includes(currentUser.role || "")
+      !["ADMIN", "SUPERVISOR", "DIGITER"].includes(currentUser.role || "")
     ) {
       navigate({ to: "/" })
     }
@@ -98,7 +98,7 @@ function Register() {
   if (
     currentUser &&
     !currentUser.is_superuser &&
-    !["admin", "supervisor", "digiter"].includes(currentUser.role || "")
+    !["ADMIN", "SUPERVISOR", "DIGITER"].includes(currentUser.role || "")
   ) {
     return null
   }
@@ -319,12 +319,6 @@ function Register() {
           )}
         </CardContent>
       </Card>
-
-      {/* Footer Info */}
-      <div className="mt-8 text-center text-sm text-muted-foreground">
-        {t("registration.loggedInAs")}{" "}
-        <span className="font-medium">{currentUser?.full_name}</span>
-      </div>
 
       {/* Registration Log / "Lock" Effect */}
       <div className="mt-12 w-full max-w-lg space-y-4">

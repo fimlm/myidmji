@@ -88,6 +88,11 @@ services:
       SMTP_TLS: "false"
       EMAILS_FROM_EMAIL: "noreply@example.com"
 
+  prestart:
+    volumes:
+      - ./backend:/app
+      - /app/.venv
+
   mailcatcher:
     image: schickling/mailcatcher
     ports:

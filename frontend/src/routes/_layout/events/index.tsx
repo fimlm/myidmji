@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_layout/events/")({
 function EventsList() {
   const { user } = useAuth()
   const isAdmin =
-    user?.is_superuser || ["admin", "supervisor"].includes(user?.role || "")
+    user?.is_superuser || ["ADMIN", "SUPERVISOR"].includes(user?.role || "")
 
   const { data: events, isLoading } = useQuery({
     queryKey: ["events"],

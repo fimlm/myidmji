@@ -68,19 +68,6 @@ export function DashboardSetup() {
     return null // Already set up or is superuser
   }
 
-  if (user?.church_id) {
-    return (
-      <Card className="w-full max-w-md mx-auto mt-8 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/10">
-        <CardHeader>
-          <CardTitle className="text-yellow-700 dark:text-yellow-500">
-            {t("dashboard.setup.pendingTitle")}
-          </CardTitle>
-          <CardDescription>{t("dashboard.setup.pendingDesc")}</CardDescription>
-        </CardHeader>
-      </Card>
-    )
-  }
-
   return (
     <Card className="w-full max-w-md mx-auto mt-8">
       <CardHeader>

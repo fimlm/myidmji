@@ -44,7 +44,10 @@ export function User({ user }: { user: any }) {
   const { logout } = useAuth()
   const { isMobile, setOpenMobile } = useSidebar()
 
-  if (!user) return null
+  const hasToken = !!localStorage.getItem("access_token")
+  if (!user && !hasToken) return null
+
+  const displayUser = user || { full_name: "Session", email: "Active" }
 
   const handleMenuClick = () => {
     if (isMobile) {

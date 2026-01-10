@@ -88,7 +88,6 @@ def read_events(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """Retrieve events."""
-    check_digiter(current_user)
     statement = select(Event).offset(skip).limit(limit)
     events = session.exec(statement).all()
     return events
@@ -160,9 +159,8 @@ def get_event_churches(
 ) -> Any:
     """
     Get all churches invited to this event.
-    Accessible to all digiters (needed for onboarding).
+    Accessible to all logged in users (needed for onboarding).
     """
-    check_digiter(current_user)
 
     # Get all links
     links_statement = select(EventChurchLink).where(EventChurchLink.event_id == event_id)

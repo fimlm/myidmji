@@ -23,10 +23,24 @@ OpenAPI.TOKEN = async () => {
 const handleApiError = (error: Error) => {
   if (error instanceof ApiError && [401, 403].includes(error.status)) {
     localStorage.removeItem("access_token")
-    window.location.href = "/login"
+    // Simple window.location.href might be slow or cause loops if not careful
+    // but here it's the most reliable way to clear the app state
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login"
+    }
   }
 }
 const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: (failureCount, error: any) => {
+        if (error instanceof ApiError && [401, 403].includes(error.status)) {
+          return false
+        }
+        return failureCount < 3
+      },
+    },
+  },
   queryCache: new QueryCache({
     onError: handleApiError,
   }),

@@ -3,7 +3,7 @@ from sqlmodel import Session
 
 from app import crud
 from app.core.config import settings
-from app.models import UserCreate
+from app.models import UserCreate, UserRole
 from app.models_events import Church, Event, EventChurchLink
 from tests.utils.utils import random_email, random_lower_string
 
@@ -75,7 +75,7 @@ def test_idor_unauthorized_stats_access(
     church_a = Church(name="Church A")
     db.add(church_a)
     db.commit()
-    user_a_in = UserCreate(email=random_email(), password="password", full_name="User A", church_id=church_a.id)
+    user_a_in = UserCreate(email=random_email(), password="password", full_name="User A", church_id=church_a.id, role=UserRole.DIGITER)
     user_a = crud.create_user(session=db, user_create=user_a_in)
 
     # 2. Setup Event X (Invited) and Event Y (NOT Invited)

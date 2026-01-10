@@ -25,7 +25,7 @@ export function AppSidebar() {
   // Show Events for Admin/Supervisor or Superuser
   const showEvents =
     currentUser?.is_superuser ||
-    ["admin", "supervisor"].includes(currentUser?.role || "")
+    ["ADMIN", "SUPERVISOR"].includes(currentUser?.role || "")
 
   const items = [...baseItems]
 
@@ -44,7 +44,7 @@ export function AppSidebar() {
   // Show Register for Digiter, Admin, or Supervisor
   const canRegister =
     currentUser?.is_superuser ||
-    ["admin", "supervisor", "digiter"].includes(currentUser?.role || "")
+    ["ADMIN", "SUPERVISOR", "DIGITER"].includes(currentUser?.role || "")
   if (canRegister) {
     items.push({ icon: Users, title: t("sidebar.register"), path: "/register" })
     items.push({ icon: UserX, title: t("sidebar.unregister"), path: "/unregister" })
@@ -52,7 +52,7 @@ export function AppSidebar() {
 
   if (
     currentUser?.is_superuser ||
-    ["admin"].includes(currentUser?.role || "")
+    ["ADMIN"].includes(currentUser?.role || "")
   ) {
     items.push({ icon: Briefcase, title: t("sidebar.admin"), path: "/admin" })
   }
