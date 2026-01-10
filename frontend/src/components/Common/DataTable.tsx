@@ -2,6 +2,7 @@ import {
   type ColumnDef,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table"
@@ -10,9 +11,12 @@ import {
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
+  Search,
 } from "lucide-react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
   Select,
   SelectContent,
@@ -44,84 +48,101 @@ export function DataTable<TData, TValue>({
   setRowSelection,
   renderToolbar,
 }: DataTableProps<TData, TValue>) {
+  const [globalFilter, setGlobalFilter] = useState("")
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: 100,
+      },
+    },
     state: {
       rowSelection,
+      globalFilter,
     },
     enableRowSelection: true,
-    onRowSelectionChange: setRowSelection as any, // Type cast or proper checking needed
+    onRowSelectionChange: setRowSelection as any,
+    onGlobalFilterChange: setGlobalFilter,
   })
 
   return (
     <div className="flex flex-col gap-4">
-      {renderToolbar && renderToolbar(table)}
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="hover:bg-transparent">
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
-                  </TableHead>
-                )
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
+      <div className="flex items-center justify-between gap-4">
+        {/* Search Bar */}
+        <div className="relative max-w-sm w-full">
+          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search..."
+            value={globalFilter ?? ""}
+            onChange={(event) => table.setGlobalFilter(event.target.value)}
+            className="pl-8"
+          />
+        </div>
+
+        {/* Custom Toolbar Actions (Filters etc) */}
+        {renderToolbar && renderToolbar(table)}
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                    </TableHead>
+                  )
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow className="hover:bg-transparent">
-              <TableCell
-                colSpan={columns.length}
-                className="h-32 text-center text-muted-foreground"
-              >
-                No results found.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {table.getPageCount() > 1 && (
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 border-t bg-muted/20">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            <div className="text-sm text-muted-foreground">
-              Showing{" "}
-              {table.getState().pagination.pageIndex *
-                table.getState().pagination.pageSize +
-                1}{" "}
-              to{" "}
-              {Math.min(
-                (table.getState().pagination.pageIndex + 1) *
-                table.getState().pagination.pageSize,
-                data.length,
-              )}{" "}
-              of{" "}
-              <span className="font-medium text-foreground">{data.length}</span>{" "}
-              entries
-            </div>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 py-4">
+          <div className="flex-1 text-sm text-muted-foreground whitespace-nowrap">
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {table.getFilteredRowModel().rows.length} row(s) selected.
+          </div>
+
+          <div className="flex items-center gap-x-6 lg:gap-x-8">
             <div className="flex items-center gap-x-2">
-              <p className="text-sm text-muted-foreground">Rows per page</p>
+              <p className="text-sm font-medium">Rows per page</p>
               <Select
                 value={`${table.getState().pagination.pageSize}`}
                 onValueChange={(value) => {
@@ -129,12 +150,10 @@ export function DataTable<TData, TValue>({
                 }}
               >
                 <SelectTrigger className="h-8 w-[70px]">
-                  <SelectValue
-                    placeholder={table.getState().pagination.pageSize}
-                  />
+                  <SelectValue placeholder={table.getState().pagination.pageSize} />
                 </SelectTrigger>
                 <SelectContent side="top">
-                  {[5, 10, 25, 50].map((pageSize) => (
+                  {[10, 25, 50, 100].map((pageSize) => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
                     </SelectItem>
@@ -142,25 +161,16 @@ export function DataTable<TData, TValue>({
                 </SelectContent>
               </Select>
             </div>
-          </div>
 
-          <div className="flex items-center gap-x-6">
-            <div className="flex items-center gap-x-1 text-sm text-muted-foreground">
-              <span>Page</span>
-              <span className="font-medium text-foreground">
-                {table.getState().pagination.pageIndex + 1}
-              </span>
-              <span>of</span>
-              <span className="font-medium text-foreground">
-                {table.getPageCount()}
-              </span>
+            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
             </div>
 
-            <div className="flex items-center gap-x-1">
+            <div className="flex items-center gap-x-2">
               <Button
                 variant="outline"
-                size="sm"
-                className="h-8 w-8 p-0"
+                className="hidden h-8 w-8 p-0 lg:flex"
                 onClick={() => table.setPageIndex(0)}
                 disabled={!table.getCanPreviousPage()}
               >
@@ -169,7 +179,6 @@ export function DataTable<TData, TValue>({
               </Button>
               <Button
                 variant="outline"
-                size="sm"
                 className="h-8 w-8 p-0"
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
@@ -179,7 +188,6 @@ export function DataTable<TData, TValue>({
               </Button>
               <Button
                 variant="outline"
-                size="sm"
                 className="h-8 w-8 p-0"
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
@@ -189,8 +197,7 @@ export function DataTable<TData, TValue>({
               </Button>
               <Button
                 variant="outline"
-                size="sm"
-                className="h-8 w-8 p-0"
+                className="hidden h-8 w-8 p-0 lg:flex"
                 onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                 disabled={!table.getCanNextPage()}
               >

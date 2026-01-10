@@ -82,6 +82,7 @@ function UsersTableContent() {
   const tableData: UserTableData[] = users.data.map((user: UserPublic) => ({
     ...user,
     isCurrentUser: currentUser?.id === user.id,
+    is_google_account: user.is_google_account || user.email.toLowerCase().endsWith("@gmail.com"),
   }))
 
   const bulkMutation = useMutation({

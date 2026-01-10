@@ -54,7 +54,7 @@ function Layout() {
           </div>
         </header>
         <main className="flex-1 p-6 md:p-8">
-          <div className="mx-auto max-w-7xl">
+          <div className="mx-auto w-full px-4 md:px-6">
             <Outlet />
           </div>
         </main>
