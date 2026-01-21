@@ -44,7 +44,11 @@ export function EditEventDialog({ event }: EditEventDialogProps) {
   })
 
   const onSubmit = (data: any) => {
-    mutation.mutate(data)
+    const payload = {
+      ...data,
+      max_registration_date: data.max_registration_date || null,
+    }
+    mutation.mutate(payload)
   }
 
   return (

@@ -44,10 +44,13 @@ export function CreateEventDialog() {
   })
 
   const onSubmit = (data: any) => {
-    mutation.mutate({
+    const payload = {
       ...data,
+      total_quota: Number(data.total_quota),
+      max_registration_date: data.max_registration_date || null,
       is_active: true,
-    })
+    }
+    mutation.mutate(payload)
   }
 
   return (
