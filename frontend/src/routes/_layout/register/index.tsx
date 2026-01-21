@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { AlertCircle, Check, ChevronsUpDown } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -61,6 +61,7 @@ function Register() {
   const { user: currentUser } = useAuth()
   const { showSuccessToast, showErrorToast } = useCustomToast()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null)
   const [openEventSelect, setOpenEventSelect] = useState(false)
   const [sessionRegistrations, setSessionRegistrations] = useState<
@@ -83,6 +84,16 @@ function Register() {
     queryKey: ["myEvents"],
     queryFn: () => EventsService.getMyEvents(),
     enabled: !!currentUser,
+  })
+
+  // Fetch total registrations count
+  const { data: totalCount = 0 } = useQuery({
+    queryKey: ["myRegistrationCount", selectedEventId],
+    queryFn: () => {
+      if (!selectedEventId) return 0
+      return EventsService.getMyRegistrationCount({ eventId: selectedEventId })
+    },
+    enabled: !!selectedEventId,
   })
 
   // Auto-select if only one event
@@ -131,6 +142,7 @@ function Register() {
         }),
       )
       setSessionRegistrations((prev) => [data, ...prev])
+      queryClient.invalidateQueries({ queryKey: ["myRegistrationCount"] })
       form.reset()
       // Create a new empty registration immediately
       const docInput = document.querySelector(
@@ -335,7 +347,7 @@ function Register() {
         <div className="flex items-center justify-between px-2">
           <h2 className="text-lg font-semibold">{t("registration.sessionLog")}</h2>
           <Badge variant="secondary" className="bg-primary/10 text-primary">
-            {sessionRegistrations.length} {t("sidebar.register")}
+            {totalCount} {t("sidebar.register")}
           </Badge>
         </div>
 

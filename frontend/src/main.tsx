@@ -20,11 +20,10 @@ OpenAPI.TOKEN = async () => {
   return localStorage.getItem("access_token") || ""
 }
 
-const handleApiError = (error: Error) => {
-  if (error instanceof ApiError && [401, 403].includes(error.status)) {
+const handleApiError = (error: any) => {
+  const status = error instanceof ApiError ? error.status : error?.status
+  if ([401, 403].includes(status)) {
     localStorage.removeItem("access_token")
-    // Simple window.location.href might be slow or cause loops if not careful
-    // but here it's the most reliable way to clear the app state
     if (window.location.pathname !== "/login") {
       window.location.href = "/login"
     }

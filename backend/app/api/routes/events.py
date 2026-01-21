@@ -220,6 +220,27 @@ class EventStats(SQLModel):
     total_registered: int
     church_stats: list[dict[str, Any]]
 
+@router.get("/{event_id}/my-registration-count", response_model=int)
+def get_my_registration_count(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID
+) -> Any:
+    """
+    Get the total number of approved/registered attendees by the current user for this event.
+    """
+    check_digiter(current_user)
+    count = session.exec(
+        select(func.count(Attendee.id))
+        .where(
+            Attendee.event_id == event_id,
+            Attendee.registered_by_id == current_user.id
+        )
+    ).one()
+    return count or 0
+
+
 @router.get("/{event_id}/stats", response_model=EventStats)
 def get_event_stats(
     *,

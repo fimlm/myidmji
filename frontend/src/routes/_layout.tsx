@@ -7,10 +7,11 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { isLoggedIn } from "@/hooks/useAuth"
+import useAuth, { isLoggedIn } from "@/hooks/useAuth"
 
 import { useNavigate } from "@tanstack/react-router"
 import { useEffect } from "react"
+import { Loader2 } from "lucide-react"
 
 export const Route = createFileRoute("/_layout")({
   component: Layout,
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/_layout")({
 
 function Layout() {
   const navigate = useNavigate()
+  const { isLoading } = useAuth()
 
   useEffect(() => {
     // Reactive check for token presence
@@ -43,6 +45,15 @@ function Layout() {
       clearInterval(interval)
     }
   }, [navigate])
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

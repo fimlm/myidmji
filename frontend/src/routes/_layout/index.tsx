@@ -13,6 +13,7 @@ export const Route = createFileRoute("/_layout/")({
 function Dashboard() {
   const { t } = useTranslation()
   const { user: currentUser } = useAuth()
+  if (!currentUser) return null
 
   const canRegister =
     currentUser?.is_superuser ||

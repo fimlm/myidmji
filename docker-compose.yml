@@ -111,8 +111,6 @@ services:
       timeout: 5s
       retries: 5
 
-    build:
-      context: ./backend
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-public

@@ -65,8 +65,8 @@ export function DashboardSetup() {
     mutation.mutate({ church_id: selectedChurchId })
   }
 
-  if (user?.church_id || user?.is_superuser) {
-    return null // Already set up or is superuser
+  if (!user || user.church_id || user.is_superuser) {
+    return null // Already set up, is superuser, or not logged in
   }
 
   return (
