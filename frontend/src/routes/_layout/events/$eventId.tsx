@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -88,7 +89,9 @@ function EventEditor() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Event Dashboard</h1>
+        <h1 className="text-3xl font-bold">
+          Event Dashboard: <span className="text-muted-foreground">{stats?.event_name || "..."}</span>
+        </h1>
       </div>
 
       {/* Global Stats Cards */}
@@ -134,6 +137,7 @@ function EventEditor() {
           <TabsTrigger value="churches">Churches & Quotas</TabsTrigger>
           <TabsTrigger value="assigned_digiters">Assigned Digiters</TabsTrigger>
           <TabsTrigger value="attendees">Attendees List</TabsTrigger>
+          <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
         </TabsList>
 
         <TabsContent value="churches" className="space-y-4">
@@ -324,7 +328,144 @@ function EventEditor() {
             </CardContent>
           </Card>
         </TabsContent>
+
+        <TabsContent value="maintenance">
+          <MaintenanceTab eventId={eventId} />
+        </TabsContent>
       </Tabs>
     </div>
   )
 }
+
+function MaintenanceTab({ eventId }: { eventId: string }) {
+  const queryClient = useQueryClient()
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  const { data: duplicates, refetch: refetchDuplicates, isFetching } = useQuery({
+    queryKey: ["eventDuplicates", eventId],
+    queryFn: () => EventsService.getEventDuplicates({ eventId }),
+  })
+
+  const cleanupMutation = useMutation({
+    mutationFn: () => EventsService.cleanupEventDuplicates({ eventId }),
+    onSuccess: (data) => {
+      toast.success(data.message)
+      queryClient.invalidateQueries({ queryKey: ["eventStats", eventId] })
+      queryClient.invalidateQueries({ queryKey: ["eventAttendees", eventId] })
+      refetchDuplicates()
+      setConfirmOpen(false)
+    },
+    onError: () => {
+      toast.error("Failed to cleanup duplicates")
+    },
+  })
+
+  const handleInitialClick = () => {
+    if (!duplicates?.length) return
+
+    // 1. Download Backup
+    const backupData = JSON.stringify(duplicates, null, 2)
+    const blob = new Blob([backupData], { type: "application/json" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `backup_duplicates_event_${eventId}_${new Date().toISOString()}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+
+    // 2. Open Custom Confirm Dialog
+    setConfirmOpen(true)
+  }
+
+  const duplicatesCount = duplicates?.reduce((acc, curr) => acc + (curr.count - 1), 0) || 0
+
+  return (
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Mantenimiento de Datos</CardTitle>
+          <CardDescription>
+            Identificar y limpiar registros duplicados basándose en el Document ID.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between p-4 border rounded-lg bg-muted/50">
+            <div>
+              <p className="font-semibold">Duplicados Encontrados: {duplicatesCount}</p>
+              <p className="text-sm text-muted-foreground">
+                Se mantendrá el registro más reciente y se eliminarán los anteriores.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => refetchDuplicates()}
+                disabled={isFetching}
+              >
+                Recargar Reporte
+              </Button>
+              <Button
+                disabled={!duplicatesCount || cleanupMutation.isPending}
+                onClick={handleInitialClick}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {cleanupMutation.isPending ? "Limpiando..." : "Descargar Backup y Limpiar"}
+              </Button>
+            </div>
+          </div>
+
+          {duplicates?.length ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Detalle de Duplicados</h3>
+              <div className="grid gap-2">
+                {duplicates.map((group) => (
+                  <div key={group.document_id} className="p-3 border rounded text-sm">
+                    <p className="font-mono font-bold mb-2">ID: {group.document_id} ({group.count} registros)</p>
+                    <ul className="list-disc list-inside text-muted-foreground">
+                      {group.attendees.map((a, idx) => (
+                        <li key={a.id}>
+                          {idx === 0 ? "🌟 (Se queda) " : "🗑️ (Borrar) "}
+                          {a.full_name} - {new Date(a.created_at!).toLocaleString()}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : !isFetching && (
+            <p className="text-center py-8 text-muted-foreground">
+              No se encontraron duplicados en este evento. ✨
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Confirmar Limpieza</DialogTitle>
+            <DialogDescription>
+              Se ha descargado un archivo de respaldo. ¿Deseas proceder con la eliminación definitiva de los registros duplicados antiguos?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+              Cancelar
+            </Button>
+            <Button
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => cleanupMutation.mutate()}
+              disabled={cleanupMutation.isPending}
+            >
+              {cleanupMutation.isPending ? "Eliminando..." : "Eliminar Registros"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
+

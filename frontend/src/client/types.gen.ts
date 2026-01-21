@@ -98,6 +98,7 @@ export type EventPublic = {
 };
 
 export type EventStats = {
+    event_name: string;
     total_quota: number;
     total_registered: number;
     church_stats: Array<{
@@ -243,6 +244,26 @@ export type ValidationError = {
     loc: Array<(string | number)>;
     msg: string;
     type: string;
+};
+
+export type EventsGetEventDuplicatesData = {
+    eventId: string;
+};
+
+export type EventsGetEventDuplicatesResponse = Array<{
+    document_id: (string | null);
+    count: number;
+    attendees: Array<AttendeePublic>;
+}>;
+
+export type EventsCleanupEventDuplicatesData = {
+    eventId: string;
+};
+
+export type EventsCleanupEventDuplicatesResponse = {
+    message: string;
+    deleted_count: number;
+    synced_churches: number;
 };
 
 export type EventsCreateChurchData = {

@@ -22,7 +22,8 @@ OpenAPI.TOKEN = async () => {
 
 const handleApiError = (error: any) => {
   const status = error instanceof ApiError ? error.status : error?.status
-  if ([401, 403].includes(status)) {
+  // Also treat 404 on /users/me as auth failure (happens if user deleted but token survives)
+  if ([401, 403, 404].includes(status)) {
     localStorage.removeItem("access_token")
     if (window.location.pathname !== "/login") {
       window.location.href = "/login"
@@ -33,7 +34,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error: any) => {
-        if (error instanceof ApiError && [401, 403].includes(error.status)) {
+        if (error instanceof ApiError && [401, 403, 404].includes(error.status)) {
           return false
         }
         return failureCount < 3

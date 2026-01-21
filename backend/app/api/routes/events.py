@@ -216,6 +216,7 @@ def get_event_churches(
 
 
 class EventStats(SQLModel):
+    event_name: str
     total_quota: int
     total_registered: int
     church_stats: list[dict[str, Any]]
@@ -279,6 +280,7 @@ def get_event_stats(
         })
 
     return EventStats(
+        event_name=event.name,
         total_quota=event.total_quota,
         total_registered=total_registered,
         church_stats=church_stats
@@ -632,3 +634,113 @@ def delete_attendee(
     session.commit()
 
     return {"message": "Attendee deleted successfully and quota restored"}
+
+
+@router.get("/{event_id}/duplicates", response_model=list[dict[str, Any]])
+def get_event_duplicates(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID
+) -> Any:
+    """
+    Get groups of attendees that share the same document_id for a specific event.
+    """
+    check_admin(current_user)
+    
+    # Encontrar document_ids duplicados
+    statement = (
+        select(Attendee.document_id)
+        .where(Attendee.event_id == event_id)
+        .where(Attendee.document_id != None)
+        .where(Attendee.document_id != "")
+        .group_by(Attendee.document_id)
+        .having(func.count(Attendee.id) > 1)
+    )
+    duplicate_ids = session.exec(statement).all()
+    
+    results = []
+    for doc_id in duplicate_ids:
+        attendees = session.exec(
+            select(Attendee)
+            .where(Attendee.event_id == event_id, Attendee.document_id == doc_id)
+            .order_by(Attendee.created_at.desc())
+        ).all()
+        
+        results.append({
+            "document_id": doc_id,
+            "count": len(attendees),
+            "attendees": [AttendeePublic.model_validate(a) for a in attendees]
+        })
+        
+    return results
+
+
+@router.post("/{event_id}/duplicates/cleanup", response_model=dict[str, Any])
+def cleanup_event_duplicates(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID
+) -> Any:
+    """
+    Delete duplicate attendee registrations, keeping only the most recent one.
+    Also synchronizes church counts.
+    """
+    check_admin(current_user)
+    
+    # 1. Identificar duplicados
+    statement = (
+        select(Attendee.document_id)
+        .where(Attendee.event_id == event_id)
+        .where(Attendee.document_id != None)
+        .where(Attendee.document_id != "")
+        .group_by(Attendee.document_id)
+        .having(func.count(Attendee.id) > 1)
+    )
+    duplicate_ids = session.exec(statement).all()
+    
+    total_deleted = 0
+    impacted_church_ids = set()
+    
+    for doc_id in duplicate_ids:
+        attendees = session.exec(
+            select(Attendee)
+            .where(Attendee.event_id == event_id, Attendee.document_id == doc_id)
+            .order_by(Attendee.created_at.desc()) # El más reciente primero
+        ).all()
+        
+        # Mantener el primero (más reciente), borrar el resto
+        to_delete = attendees[1:]
+        for a in to_delete:
+            impacted_church_ids.add(a.church_id)
+            session.delete(a)
+            total_deleted += 1
+            
+    session.commit()
+    
+    # 2. Resincronizar contadores para las iglesias afectadas (o todas por seguridad)
+    # Por ahora solo las afectadas para eficiencia
+    synced_churches = 0
+    for church_id in impacted_church_ids:
+        link = session.exec(
+            select(EventChurchLink)
+            .where(EventChurchLink.event_id == event_id, EventChurchLink.church_id == church_id)
+        ).first()
+        
+        if link:
+            actual_count = session.exec(
+                select(func.count(Attendee.id))
+                .where(Attendee.event_id == event_id, Attendee.church_id == church_id)
+            ).one()
+            link.registered_count = actual_count
+            session.add(link)
+            synced_churches += 1
+            
+    session.commit()
+    
+    return {
+        "message": f"Successfully cleaned up {total_deleted} duplicates across {synced_churches} churches.",
+        "deleted_count": total_deleted,
+        "synced_churches": synced_churches
+    }
