@@ -21,6 +21,7 @@ import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
 import { Route as LayoutUnregisterIndexRouteImport } from './routes/_layout/unregister/index'
 import { Route as LayoutRegisterIndexRouteImport } from './routes/_layout/register/index'
 import { Route as LayoutEventsIndexRouteImport } from './routes/_layout/events/index'
+import { Route as LayoutCheckinIndexRouteImport } from './routes/_layout/checkin/index'
 import { Route as LayoutEventsEventIdRouteImport } from './routes/_layout/events/$eventId'
 
 const SignupRoute = SignupRouteImport.update({
@@ -82,6 +83,11 @@ const LayoutEventsIndexRoute = LayoutEventsIndexRouteImport.update({
   path: '/events/',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutCheckinIndexRoute = LayoutCheckinIndexRouteImport.update({
+  id: '/checkin/',
+  path: '/checkin/',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutEventsEventIdRoute = LayoutEventsEventIdRouteImport.update({
   id: '/events/$eventId',
   path: '/events/$eventId',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
   '/events/$eventId': typeof LayoutEventsEventIdRoute
+  '/checkin': typeof LayoutCheckinIndexRoute
   '/events': typeof LayoutEventsIndexRoute
   '/register': typeof LayoutRegisterIndexRoute
   '/unregister': typeof LayoutUnregisterIndexRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
   '/events/$eventId': typeof LayoutEventsEventIdRoute
+  '/checkin': typeof LayoutCheckinIndexRoute
   '/events': typeof LayoutEventsIndexRoute
   '/register': typeof LayoutRegisterIndexRoute
   '/unregister': typeof LayoutUnregisterIndexRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/events/$eventId': typeof LayoutEventsEventIdRoute
+  '/_layout/checkin/': typeof LayoutCheckinIndexRoute
   '/_layout/events/': typeof LayoutEventsIndexRoute
   '/_layout/register/': typeof LayoutRegisterIndexRoute
   '/_layout/unregister/': typeof LayoutUnregisterIndexRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/'
     | '/events/$eventId'
+    | '/checkin'
     | '/events'
     | '/register'
     | '/unregister'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/'
     | '/events/$eventId'
+    | '/checkin'
     | '/events'
     | '/register'
     | '/unregister'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/_layout/settings'
     | '/_layout/'
     | '/_layout/events/$eventId'
+    | '/_layout/checkin/'
     | '/_layout/events/'
     | '/_layout/register/'
     | '/_layout/unregister/'
@@ -272,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutEventsIndexRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/checkin/': {
+      id: '/_layout/checkin/'
+      path: '/checkin'
+      fullPath: '/checkin'
+      preLoaderRoute: typeof LayoutCheckinIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/events/$eventId': {
       id: '/_layout/events/$eventId'
       path: '/events/$eventId'
@@ -288,6 +307,7 @@ interface LayoutRouteChildren {
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutEventsEventIdRoute: typeof LayoutEventsEventIdRoute
+  LayoutCheckinIndexRoute: typeof LayoutCheckinIndexRoute
   LayoutEventsIndexRoute: typeof LayoutEventsIndexRoute
   LayoutRegisterIndexRoute: typeof LayoutRegisterIndexRoute
   LayoutUnregisterIndexRoute: typeof LayoutUnregisterIndexRoute
@@ -299,6 +319,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutEventsEventIdRoute: LayoutEventsEventIdRoute,
+  LayoutCheckinIndexRoute: LayoutCheckinIndexRoute,
   LayoutEventsIndexRoute: LayoutEventsIndexRoute,
   LayoutRegisterIndexRoute: LayoutRegisterIndexRoute,
   LayoutUnregisterIndexRoute: LayoutUnregisterIndexRoute,

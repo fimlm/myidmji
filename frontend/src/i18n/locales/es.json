@@ -33,7 +33,8 @@
     "events": "Eventos",
     "register": "Registrar",
     "admin": "Admin",
-    "unregister": "Eliminar Registro"
+    "unregister": "Eliminar Registro",
+    "checkin": "Ingreso"
   },
   "dashboard": {
     "greeting": "Hola, {{name}} 👋",
@@ -149,5 +150,33 @@
       "editButton": "Editar",
       "successToast": "Usuario actualizado con éxito"
     }
+  },
+  "checkin": {
+    "title": "Control de Ingreso",
+    "searchTitle": "Buscar Asistente",
+    "searchDesc": "Escanea o digita el documento de identidad",
+    "documentLabel": "Documento de Identidad",
+    "documentPlaceholder": "Ej: 123456789",
+    "searchButton": "Buscar",
+    "searching": "Buscando...",
+    "selectEvent": "Seleccionar Evento",
+    "selectEventPlaceholder": "Selecciona un evento...",
+    "noEvent": "No se encontró evento.",
+    "notFoundTitle": "No registrado",
+    "notFoundDesc": "Esta persona no está registrada para este evento.",
+    "notFoundAction": "Intentar de nuevo",
+    "successTitle": "¡Ingreso Exitoso!",
+    "alreadyCheckedIn": "⚠️ YA INGRESÓ: {{date}}",
+    "confirmButton": "CONFIRMAR INGRESO",
+    "registering": "Registrando...",
+    "cancelButton": "Cancelar",
+    "recentLog": "Ingresos Recientes (Esta sesión)",
+    "noLog": "No has realizado ingresos en esta sesión.",
+    "church": "Iglesia",
+    "searchByNameButton": "¿Buscar por Nombre?",
+    "searchByNamePlaceholder": "Ingresa el nombre (min 3 letras)",
+    "resultsTitle": "Resultados de Búsqueda",
+    "noResults": "No se encontraron coincidencias.",
+    "backToId": "Volver a Cédula"
   }
 }

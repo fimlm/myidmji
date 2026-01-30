@@ -3,7 +3,7 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { EventsCreateChurchData, EventsCreateChurchResponse, EventsReadChurchesData, EventsReadChurchesResponse, EventsCreateEventData, EventsCreateEventResponse, EventsReadEventsData, EventsReadEventsResponse, EventsUpdateEventData, EventsUpdateEventResponse, EventsInviteChurchToEventData, EventsInviteChurchToEventResponse, EventsGetEventChurchesData, EventsGetEventChurchesResponse, EventsGetEventStatsData, EventsGetEventStatsResponse, EventsGetEventAttendeesData, EventsGetEventAttendeesResponse, EventsGetEventDigitersData, EventsGetEventDigitersResponse, EventsGetMyEventsResponse, EventsInviteChurchesBulkData, EventsInviteChurchesBulkResponse, EventsInviteChurchesCreateBulkData, EventsInviteChurchesCreateBulkResponse, EventsRegisterAttendeeData, EventsRegisterAttendeeResponse, EventsSearchAttendeeByDocumentData, EventsSearchAttendeeByDocumentResponse, EventsDeleteAttendeeData, EventsDeleteAttendeeResponse, EventsGetEventDuplicatesData, EventsGetEventDuplicatesResponse, EventsCleanupEventDuplicatesData, EventsCleanupEventDuplicatesResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginLoginGoogleData, LoginLoginGoogleResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersUpdateUsersBulkData, UsersUpdateUsersBulkResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { EventsCreateChurchData, EventsCreateChurchResponse, EventsReadChurchesData, EventsReadChurchesResponse, EventsCreateEventData, EventsCreateEventResponse, EventsReadEventsData, EventsReadEventsResponse, EventsGetMyEventsResponse, EventsReadEventData, EventsReadEventResponse, EventsUpdateEventData, EventsUpdateEventResponse, EventsInviteChurchToEventData, EventsInviteChurchToEventResponse, EventsGetEventChurchesData, EventsGetEventChurchesResponse, EventsGetMyRegistrationCountData, EventsGetMyRegistrationCountResponse, EventsGetEventStatsData, EventsGetEventStatsResponse, EventsGetEventAttendeesData, EventsGetEventAttendeesResponse, EventsGetEventDigitersData, EventsGetEventDigitersResponse, EventsInviteChurchesBulkData, EventsInviteChurchesBulkResponse, EventsInviteChurchesCreateBulkData, EventsInviteChurchesCreateBulkResponse, EventsRegisterAttendeeData, EventsRegisterAttendeeResponse, EventsSearchAttendeeByDocumentData, EventsSearchAttendeeByDocumentResponse, EventsSearchAttendeeByNameData, EventsSearchAttendeeByNameResponse, EventsDeleteAttendeeData, EventsDeleteAttendeeResponse, EventsGetEventDuplicatesData, EventsGetEventDuplicatesResponse, EventsCleanupEventDuplicatesData, EventsCleanupEventDuplicatesResponse, EventsCheckinAttendeeData, EventsCheckinAttendeeResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginLoginGoogleData, LoginLoginGoogleResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersUpdateUsersBulkData, UsersUpdateUsersBulkResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
 
 export class EventsService {
     /**
@@ -25,7 +25,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Read Churches
      * Retrieve churches.
@@ -48,7 +48,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Create Event
      * Create new event.
@@ -68,7 +68,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Read Events
      * Retrieve events.
@@ -91,7 +91,41 @@ export class EventsService {
             }
         });
     }
-
+    
+    /**
+     * Get My Events
+     * Get all active events that the current user's church is invited to.
+     * @returns EventPublic Successful Response
+     * @throws ApiError
+     */
+    public static getMyEvents(): CancelablePromise<EventsGetMyEventsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/my-events'
+        });
+    }
+    
+    /**
+     * Read Event
+     * Get event by ID.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @returns EventPublic Successful Response
+     * @throws ApiError
+     */
+    public static readEvent(data: EventsReadEventData): CancelablePromise<EventsReadEventResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/{event_id}',
+            path: {
+                event_id: data.eventId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
     /**
      * Update Event
      * Update an event.
@@ -115,7 +149,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Invite Church To Event
      * Invite a church to an event and assign quota.
@@ -142,7 +176,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Get Event Churches
      * Get all churches invited to this event.
@@ -164,7 +198,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Get My Registration Count
      * Get the total number of approved/registered attendees by the current user for this event.
@@ -173,7 +207,7 @@ export class EventsService {
      * @returns number Successful Response
      * @throws ApiError
      */
-    public static getMyRegistrationCount(data: { eventId: string }): CancelablePromise<number> {
+    public static getMyRegistrationCount(data: EventsGetMyRegistrationCountData): CancelablePromise<EventsGetMyRegistrationCountResponse> {
         return __request(OpenAPI, {
             method: 'GET',
             url: '/api/v1/events/{event_id}/my-registration-count',
@@ -185,7 +219,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Get Event Stats
      * Get detailed statistics for an event.
@@ -206,7 +240,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Get Event Attendees
      * Get all attendees registered for an event.
@@ -233,50 +267,7 @@ export class EventsService {
             }
         });
     }
-
-    /**
-     * Get Event Duplicates
-     * Get groups of attendees that share the same document_id for a specific event.
-     * @param data The data for the request.
-     * @param data.eventId
-     * @returns unknown Successful Response
-     * @throws ApiError
-     */
-    public static getEventDuplicates(data: EventsGetEventDuplicatesData): CancelablePromise<EventsGetEventDuplicatesResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/events/{event_id}/duplicates',
-            path: {
-                event_id: data.eventId
-            },
-            errors: {
-                422: 'Validation Error'
-            }
-        });
-    }
-
-    /**
-     * Cleanup Event Duplicates
-     * Delete duplicate attendee registrations, keeping only the most recent one.
-     * Also synchronizes church counts.
-     * @param data The data for the request.
-     * @param data.eventId
-     * @returns unknown Successful Response
-     * @throws ApiError
-     */
-    public static cleanupEventDuplicates(data: EventsCleanupEventDuplicatesData): CancelablePromise<EventsCleanupEventDuplicatesResponse> {
-        return __request(OpenAPI, {
-            method: 'POST',
-            url: '/api/v1/events/{event_id}/duplicates/cleanup',
-            path: {
-                event_id: data.eventId
-            },
-            errors: {
-                422: 'Validation Error'
-            }
-        });
-    }
-
+    
     /**
      * Get Event Digiters
      * Get all digiters associated with churches invited to this event.
@@ -297,20 +288,7 @@ export class EventsService {
             }
         });
     }
-
-    /**
-     * Get My Events
-     * Get all active events that the current user's church is invited to.
-     * @returns EventPublic Successful Response
-     * @throws ApiError
-     */
-    public static getMyEvents(): CancelablePromise<EventsGetMyEventsResponse> {
-        return __request(OpenAPI, {
-            method: 'GET',
-            url: '/api/v1/events/my-events'
-        });
-    }
-
+    
     /**
      * Invite Churches Bulk
      * Invite multiple churches to an event with quotas.
@@ -334,7 +312,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Invite Churches Create Bulk
      * Invite multiple churches by NAME.
@@ -360,7 +338,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Register Attendee
      * Register an attendee for an event.
@@ -385,7 +363,7 @@ export class EventsService {
             }
         });
     }
-
+    
     /**
      * Search Attendee By Document
      * Search for an attendee by document ID within a specific event.
@@ -412,7 +390,35 @@ export class EventsService {
             }
         });
     }
-
+    
+    /**
+     * Search Attendee By Name
+     * Search for attendees by name (fuzzy match) within a specific event.
+     * Digiter can only search within their own church.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.q
+     * @param data.limit
+     * @returns AttendeePublic Successful Response
+     * @throws ApiError
+     */
+    public static searchAttendeeByName(data: EventsSearchAttendeeByNameData): CancelablePromise<EventsSearchAttendeeByNameResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/{event_id}/attendees/search-by-name',
+            path: {
+                event_id: data.eventId
+            },
+            query: {
+                q: data.q,
+                limit: data.limit
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
     /**
      * Delete Attendee
      * Delete an attendee and restore quota.
@@ -426,6 +432,72 @@ export class EventsService {
         return __request(OpenAPI, {
             method: 'DELETE',
             url: '/api/v1/events/{event_id}/attendees/{attendee_id}',
+            path: {
+                event_id: data.eventId,
+                attendee_id: data.attendeeId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Get Event Duplicates
+     * Get groups of attendees that share the same document_id for a specific event.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static getEventDuplicates(data: EventsGetEventDuplicatesData): CancelablePromise<EventsGetEventDuplicatesResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/events/{event_id}/duplicates',
+            path: {
+                event_id: data.eventId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Cleanup Event Duplicates
+     * Delete duplicate attendee registrations, keeping only the most recent one.
+     * Also synchronizes church counts.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @returns unknown Successful Response
+     * @throws ApiError
+     */
+    public static cleanupEventDuplicates(data: EventsCleanupEventDuplicatesData): CancelablePromise<EventsCleanupEventDuplicatesResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/events/{event_id}/duplicates/cleanup',
+            path: {
+                event_id: data.eventId
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Checkin Attendee
+     * Mark an attendee as checked in.
+     * @param data The data for the request.
+     * @param data.eventId
+     * @param data.attendeeId
+     * @returns AttendeePublic Successful Response
+     * @throws ApiError
+     */
+    public static checkinAttendee(data: EventsCheckinAttendeeData): CancelablePromise<EventsCheckinAttendeeResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/events/{event_id}/attendees/{attendee_id}/checkin',
             path: {
                 event_id: data.eventId,
                 attendee_id: data.attendeeId
@@ -460,7 +532,7 @@ export class ItemsService {
             }
         });
     }
-
+    
     /**
      * Create Item
      * Create new item.
@@ -480,7 +552,7 @@ export class ItemsService {
             }
         });
     }
-
+    
     /**
      * Read Item
      * Get item by ID.
@@ -501,7 +573,7 @@ export class ItemsService {
             }
         });
     }
-
+    
     /**
      * Update Item
      * Update an item.
@@ -525,7 +597,7 @@ export class ItemsService {
             }
         });
     }
-
+    
     /**
      * Delete Item
      * Delete an item.
@@ -568,7 +640,7 @@ export class LoginService {
             }
         });
     }
-
+    
     /**
      * Login Google
      * Login with Google ID Token.
@@ -589,7 +661,7 @@ export class LoginService {
             }
         });
     }
-
+    
     /**
      * Test Token
      * Test access token
@@ -602,7 +674,7 @@ export class LoginService {
             url: '/api/v1/login/test-token'
         });
     }
-
+    
     /**
      * Recover Password
      * Password Recovery
@@ -623,7 +695,7 @@ export class LoginService {
             }
         });
     }
-
+    
     /**
      * Reset Password
      * Reset password
@@ -643,7 +715,7 @@ export class LoginService {
             }
         });
     }
-
+    
     /**
      * Recover Password Html Content
      * HTML Content for Password Recovery
@@ -713,7 +785,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Create User
      * Create new user.
@@ -733,7 +805,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Read User Me
      * Get current user.
@@ -746,7 +818,7 @@ export class UsersService {
             url: '/api/v1/users/me'
         });
     }
-
+    
     /**
      * Delete User Me
      * Delete own user.
@@ -759,7 +831,7 @@ export class UsersService {
             url: '/api/v1/users/me'
         });
     }
-
+    
     /**
      * Update User Me
      * Update own user.
@@ -779,7 +851,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Update Password Me
      * Update own password.
@@ -799,7 +871,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Register User
      * Create new user without the need to be logged in.
@@ -819,7 +891,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Update Users Bulk
      * Update multiple users at once (Role, Church, Activation).
@@ -840,7 +912,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Read User By Id
      * Get a specific user by id.
@@ -861,7 +933,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Update User
      * Update a user.
@@ -885,7 +957,7 @@ export class UsersService {
             }
         });
     }
-
+    
     /**
      * Delete User
      * Delete a user.
@@ -929,7 +1001,7 @@ export class UtilsService {
             }
         });
     }
-
+    
     /**
      * Health Check
      * @returns boolean Successful Response

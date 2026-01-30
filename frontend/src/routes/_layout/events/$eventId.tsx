@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createFileRoute } from "@tanstack/react-router"
+import { Link, createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import { toast } from "sonner"
 import { type AttendeePublic, EventsService, type UserPublic } from "@/client"
@@ -92,42 +92,72 @@ function EventEditor() {
         <h1 className="text-3xl font-bold">
           Event Dashboard: <span className="text-muted-foreground">{stats?.event_name || "..."}</span>
         </h1>
+        <Button asChild className="bg-blue-600 hover:bg-blue-700">
+          {/* @ts-ignore */}
+          <Link to="/checkin/$eventId" params={{ eventId }}>
+            Control de Ingreso
+          </Link>
+        </Button>
       </div>
 
       {/* Global Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Quota</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Quota
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_quota}</div>
+            <div className="text-3xl font-bold">{stats?.total_quota}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
               Registered Attendees
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_registered}</div>
-            <p className="text-xs text-muted-foreground">
-              {stats?.total_quota
-                ? Math.round((stats.total_registered / stats.total_quota) * 100)
-                : 0}
+            <div className="text-3xl font-bold">{stats?.total_registered}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {Math.round(
+                ((stats?.total_registered || 0) / (stats?.total_quota || 1)) * 100,
+              )}
               % Filled
             </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Remote Digitizers
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Checked-in
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{digiters?.length || 0}</div>
+            <div className="text-3xl font-bold text-primary">{stats?.checked_in_count}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {Math.round(
+                ((stats?.checked_in_count || 0) / (stats?.total_registered || 1)) *
+                100,
+              )}
+              % Attendance
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Physical Capacity Left
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-amber-500">
+              {(stats?.total_quota || 0) - (stats?.checked_in_count || 0)}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Based on check-ins
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -157,6 +187,7 @@ function EventEditor() {
                     <TableHead>Church Name</TableHead>
                     <TableHead>Assigned Quota</TableHead>
                     <TableHead>Registered</TableHead>
+                    <TableHead>Checked-in</TableHead>
                     <TableHead>Digiters</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -182,8 +213,9 @@ function EventEditor() {
                           />
                         </div>
                       </TableCell>
+                      <TableCell>{church.registered_count}</TableCell>
                       <TableCell>
-                        {church.registered_count} / {church.quota_limit}
+                        {church.checked_in_count}
                       </TableCell>
                       <TableCell>{church.digiters_count}</TableCell>
                       <TableCell className="text-right">
@@ -343,12 +375,12 @@ function MaintenanceTab({ eventId }: { eventId: string }) {
 
   const { data: duplicates, refetch: refetchDuplicates, isFetching } = useQuery({
     queryKey: ["eventDuplicates", eventId],
-    queryFn: () => EventsService.getEventDuplicates({ eventId }),
+    queryFn: () => EventsService.getEventDuplicates({ eventId }) as Promise<any[]>,
   })
 
   const cleanupMutation = useMutation({
     mutationFn: () => EventsService.cleanupEventDuplicates({ eventId }),
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       toast.success(data.message)
       queryClient.invalidateQueries({ queryKey: ["eventStats", eventId] })
       queryClient.invalidateQueries({ queryKey: ["eventAttendees", eventId] })
@@ -379,7 +411,7 @@ function MaintenanceTab({ eventId }: { eventId: string }) {
     setConfirmOpen(true)
   }
 
-  const duplicatesCount = duplicates?.reduce((acc, curr) => acc + (curr.count - 1), 0) || 0
+  const duplicatesCount = duplicates?.reduce((acc: number, curr: any) => acc + (curr.count - 1), 0) || 0
 
   return (
     <>
@@ -399,6 +431,9 @@ function MaintenanceTab({ eventId }: { eventId: string }) {
               </p>
             </div>
             <div className="flex gap-2">
+              <Button variant="default" className="bg-blue-600 hover:bg-blue-700" asChild>
+                <Link to="/checkin"> control de Ingreso</Link>
+              </Button>
               <Button
                 variant="outline"
                 onClick={() => refetchDuplicates()}
@@ -420,11 +455,11 @@ function MaintenanceTab({ eventId }: { eventId: string }) {
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Detalle de Duplicados</h3>
               <div className="grid gap-2">
-                {duplicates.map((group) => (
+                {duplicates.map((group: any) => (
                   <div key={group.document_id} className="p-3 border rounded text-sm">
                     <p className="font-mono font-bold mb-2">ID: {group.document_id} ({group.count} registros)</p>
                     <ul className="list-disc list-inside text-muted-foreground">
-                      {group.attendees.map((a, idx) => (
+                      {group.attendees.map((a: any, idx: number) => (
                         <li key={a.id}>
                           {idx === 0 ? "🌟 (Se queda) " : "🗑️ (Borrar) "}
                           {a.full_name} - {new Date(a.created_at!).toLocaleString()}

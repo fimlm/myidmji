@@ -21,6 +21,7 @@ export type AttendeePublic = {
     church_name?: (string | null);
     event_name?: (string | null);
     created_at?: (string | null);
+    checked_in_at?: (string | null);
 };
 
 export type Body_login_login_access_token = {
@@ -101,6 +102,7 @@ export type EventStats = {
     event_name: string;
     total_quota: number;
     total_registered: number;
+    checked_in_count: number;
     church_stats: Array<{
         [key: string]: unknown;
     }>;
@@ -246,26 +248,6 @@ export type ValidationError = {
     type: string;
 };
 
-export type EventsGetEventDuplicatesData = {
-    eventId: string;
-};
-
-export type EventsGetEventDuplicatesResponse = Array<{
-    document_id: (string | null);
-    count: number;
-    attendees: Array<AttendeePublic>;
-}>;
-
-export type EventsCleanupEventDuplicatesData = {
-    eventId: string;
-};
-
-export type EventsCleanupEventDuplicatesResponse = {
-    message: string;
-    deleted_count: number;
-    synced_churches: number;
-};
-
 export type EventsCreateChurchData = {
     requestBody: ChurchCreate;
 };
@@ -292,6 +274,14 @@ export type EventsReadEventsData = {
 
 export type EventsReadEventsResponse = (Array<EventPublic>);
 
+export type EventsGetMyEventsResponse = (Array<EventPublic>);
+
+export type EventsReadEventData = {
+    eventId: string;
+};
+
+export type EventsReadEventResponse = (EventPublic);
+
 export type EventsUpdateEventData = {
     eventId: string;
     requestBody: EventUpdate;
@@ -313,6 +303,12 @@ export type EventsGetEventChurchesData = {
 
 export type EventsGetEventChurchesResponse = (ChurchesPublic);
 
+export type EventsGetMyRegistrationCountData = {
+    eventId: string;
+};
+
+export type EventsGetMyRegistrationCountResponse = (number);
+
 export type EventsGetEventStatsData = {
     eventId: string;
 };
@@ -332,8 +328,6 @@ export type EventsGetEventDigitersData = {
 };
 
 export type EventsGetEventDigitersResponse = (Array<UserPublic>);
-
-export type EventsGetMyEventsResponse = (Array<EventPublic>);
 
 export type EventsInviteChurchesBulkData = {
     eventId: string;
@@ -363,6 +357,14 @@ export type EventsSearchAttendeeByDocumentData = {
 
 export type EventsSearchAttendeeByDocumentResponse = (AttendeePublic);
 
+export type EventsSearchAttendeeByNameData = {
+    eventId: string;
+    limit?: number;
+    q: string;
+};
+
+export type EventsSearchAttendeeByNameResponse = (Array<AttendeePublic>);
+
 export type EventsDeleteAttendeeData = {
     attendeeId: string;
     eventId: string;
@@ -371,6 +373,29 @@ export type EventsDeleteAttendeeData = {
 export type EventsDeleteAttendeeResponse = ({
     [key: string]: (string);
 });
+
+export type EventsGetEventDuplicatesData = {
+    eventId: string;
+};
+
+export type EventsGetEventDuplicatesResponse = (Array<{
+    [key: string]: unknown;
+}>);
+
+export type EventsCleanupEventDuplicatesData = {
+    eventId: string;
+};
+
+export type EventsCleanupEventDuplicatesResponse = ({
+    [key: string]: unknown;
+});
+
+export type EventsCheckinAttendeeData = {
+    attendeeId: string;
+    eventId: string;
+};
+
+export type EventsCheckinAttendeeResponse = (AttendeePublic);
 
 export type ItemsReadItemsData = {
     limit?: number;

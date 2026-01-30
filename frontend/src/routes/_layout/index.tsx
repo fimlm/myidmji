@@ -100,6 +100,20 @@ function Dashboard() {
                 </CardHeader>
               </Card>
             </Link>
+
+            <Link to="/checkin" className="group">
+              <Card className="h-full transition-all hover:border-primary/50 hover:bg-primary/5 group-hover:shadow-md cursor-pointer">
+                <CardHeader>
+                  <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                    <Shield className="h-6 w-6" />
+                  </div>
+                  <CardTitle>{t("checkin.title")}</CardTitle>
+                  <CardDescription>
+                    {t("checkin.searchDesc")}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </Link>
           </>
         )}
 

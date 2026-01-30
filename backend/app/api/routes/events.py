@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 from typing import Any, cast
 
 from fastapi import APIRouter, HTTPException
@@ -29,6 +30,7 @@ def check_admin(user: User) -> None:
     if user.role != UserRole.ADMIN and not user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
+
 def check_digiter(user: User) -> None:
     if (
         user.role not in [UserRole.DIGITER, UserRole.ADMIN, UserRole.SUPERVISOR]
@@ -36,10 +38,9 @@ def check_digiter(user: User) -> None:
     ):
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
+
 def check_supervisor(user: User) -> None:
-    if (
-        user.role not in [UserRole.ADMIN, UserRole.SUPERVISOR] and not user.is_superuser
-    ):
+    if user.role not in [UserRole.ADMIN, UserRole.SUPERVISOR] and not user.is_superuser:
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
 
@@ -88,8 +89,25 @@ def read_events(
     session: SessionDep, current_user: CurrentUser, skip: int = 0, limit: int = 100
 ) -> Any:
     """Retrieve events."""
-    statement = select(Event).offset(skip).limit(limit)
-    events = session.exec(statement).all()
+    if current_user.is_superuser or current_user.role in [
+        UserRole.ADMIN,
+        UserRole.SUPERVISOR,
+    ]:
+        statement = select(Event).offset(skip).limit(limit)
+    else:
+        if not current_user.church_id:
+            return []
+        statement = (
+            select(Event)
+            .join(EventChurchLink)
+            .where(
+                EventChurchLink.church_id == current_user.church_id,
+                Event.is_active == True,
+            )
+            .offset(skip)
+            .limit(limit)
+        )
+
     events = session.exec(statement).all()
     return events
 
@@ -111,8 +129,7 @@ def get_my_events(
         select(Event)
         .join(EventChurchLink)
         .where(
-            EventChurchLink.church_id == current_user.church_id,
-            Event.is_active == True
+            EventChurchLink.church_id == current_user.church_id, Event.is_active == True
         )
     )
 
@@ -137,7 +154,7 @@ def update_event(
     session: SessionDep,
     current_user: CurrentUser,
     event_id: uuid.UUID,
-    event_in: EventUpdate
+    event_in: EventUpdate,
 ) -> Any:
     """Update an event."""
     check_supervisor(current_user)
@@ -160,7 +177,7 @@ def invite_church_to_event(
     current_user: CurrentUser,
     event_id: uuid.UUID,
     church_id: uuid.UUID,
-    quota: int
+    quota: int,
 ) -> Any:
     """
     Invite a church to an event and assign quota.
@@ -180,7 +197,9 @@ def invite_church_to_event(
         link.quota_limit = quota
         session.add(link)
     else:
-        link = EventChurchLink(event_id=event_id, church_id=church_id, quota_limit=quota)
+        link = EventChurchLink(
+            event_id=event_id, church_id=church_id, quota_limit=quota
+        )
         session.add(link)
 
     session.commit()
@@ -190,10 +209,7 @@ def invite_church_to_event(
 
 @router.get("/{event_id}/churches", response_model=ChurchesPublic)
 def get_event_churches(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID
+    *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
 ) -> Any:
     """
     Get all churches invited to this event.
@@ -201,7 +217,9 @@ def get_event_churches(
     """
 
     # Get all links
-    links_statement = select(EventChurchLink).where(EventChurchLink.event_id == event_id)
+    links_statement = select(EventChurchLink).where(
+        EventChurchLink.event_id == event_id
+    )
     links = session.exec(links_statement).all()
     church_ids = [link.church_id for link in links]
 
@@ -219,24 +237,21 @@ class EventStats(SQLModel):
     event_name: str
     total_quota: int
     total_registered: int
+    checked_in_count: int
     church_stats: list[dict[str, Any]]
+
 
 @router.get("/{event_id}/my-registration-count", response_model=int)
 def get_my_registration_count(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID
+    *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
 ) -> Any:
     """
     Get the total number of approved/registered attendees by the current user for this event.
     """
     check_digiter(current_user)
     count = session.exec(
-        select(func.count(Attendee.id))
-        .where(
-            Attendee.event_id == event_id,
-            Attendee.registered_by_id == current_user.id
+        select(func.count(Attendee.id)).where(
+            Attendee.event_id == event_id, Attendee.registered_by_id == current_user.id
         )
     ).one()
     return count or 0
@@ -244,10 +259,7 @@ def get_my_registration_count(
 
 @router.get("/{event_id}/stats", response_model=EventStats)
 def get_event_stats(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID
+    *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
 ) -> Any:
     """
     Get detailed statistics for an event.
@@ -258,7 +270,9 @@ def get_event_stats(
         raise HTTPException(status_code=404, detail="Event not found")
 
     # Get all links (churches invited)
-    links = session.exec(select(EventChurchLink).where(EventChurchLink.event_id == event_id)).all()
+    links = session.exec(
+        select(EventChurchLink).where(EventChurchLink.event_id == event_id)
+    ).all()
 
     total_registered = sum(link.registered_count for link in links)
 
@@ -268,22 +282,42 @@ def get_event_stats(
         church_name = church.name if church else "Unknown"
         # Optional: Count digiters for this church
         digiters_count = session.exec(
-            select(func.count()).select_from(User).where(User.church_id == link.church_id, User.role == UserRole.DIGITER)
+            select(func.count())
+            .select_from(User)
+            .where(User.church_id == link.church_id, User.role == UserRole.DIGITER)
         ).one()
 
-        church_stats.append({
-            "church_id": link.church_id,
-            "church_name": church_name,
-            "quota_limit": link.quota_limit,
-            "registered_count": link.registered_count,
-            "digiters_count": digiters_count
-        })
+        church_stats.append(
+            {
+                "church_id": link.church_id,
+                "church_name": church_name,
+                "quota_limit": link.quota_limit,
+                "registered_count": link.registered_count,
+                "checked_in_count": session.exec(
+                    select(func.count())
+                    .select_from(Attendee)
+                    .where(
+                        Attendee.event_id == event_id,
+                        Attendee.church_id == link.church_id,
+                        Attendee.checked_in_at != None,
+                    )
+                ).one(),
+                "digiters_count": digiters_count,
+            }
+        )
+
+    checked_in_count = session.exec(
+        select(func.count())
+        .select_from(Attendee)
+        .where(Attendee.event_id == event_id, Attendee.checked_in_at != None)
+    ).one()
 
     return EventStats(
         event_name=event.name,
         total_quota=event.total_quota,
         total_registered=total_registered,
-        church_stats=church_stats
+        checked_in_count=checked_in_count,
+        church_stats=church_stats,
     )
 
 
@@ -294,7 +328,7 @@ def get_event_attendees(
     current_user: CurrentUser,
     event_id: uuid.UUID,
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
 ) -> Any:
     """
     Get all attendees registered for an event.
@@ -309,7 +343,10 @@ def get_event_attendees(
     )
 
     # Privacy Isolation: If not Admin/Supervisor, only show attendees from their own church
-    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [UserRole.ADMIN, UserRole.SUPERVISOR]
+    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
+        UserRole.ADMIN,
+        UserRole.SUPERVISOR,
+    ]
 
     if not is_admin_or_supervisor:
         if current_user.church_id:
@@ -318,9 +355,7 @@ def get_event_attendees(
             # If for some reason a digiter has no church_id, they see nothing
             return []
 
-    attendees_data = session.exec(
-        statement.offset(skip).limit(limit)
-    ).all()
+    attendees_data = session.exec(statement.offset(skip).limit(limit)).all()
 
     results = []
     for attendee, email in attendees_data:
@@ -333,10 +368,7 @@ def get_event_attendees(
 
 @router.get("/{event_id}/digiters", response_model=list[UserPublic])
 def get_event_digiters(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID
+    *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
 ) -> Any:
     """
     Get all digiters associated with churches invited to this event.
@@ -344,7 +376,9 @@ def get_event_digiters(
     check_supervisor(current_user)
 
     # 1. Get churches linked to this event
-    links = session.exec(select(EventChurchLink).where(EventChurchLink.event_id == event_id)).all()
+    links = session.exec(
+        select(EventChurchLink).where(EventChurchLink.event_id == event_id)
+    ).all()
     church_ids = [link.church_id for link in links]
 
     if not church_ids:
@@ -360,12 +394,11 @@ def get_event_digiters(
     return digiters
 
 
-
-
 # --- Extras ---
 class ChurchInvite(SQLModel):
     church_id: uuid.UUID
     quota: int
+
 
 class BulkInviteRequest(SQLModel):
     invites: list[ChurchInvite]
@@ -377,7 +410,7 @@ def invite_churches_bulk(
     session: SessionDep,
     current_user: CurrentUser,
     event_id: uuid.UUID,
-    data: BulkInviteRequest
+    data: BulkInviteRequest,
 ) -> Any:
     """
     Invite multiple churches to an event with quotas.
@@ -394,7 +427,9 @@ def invite_churches_bulk(
             link.quota_limit = invite.quota
             session.add(link)
         else:
-            link = EventChurchLink(event_id=event_id, church_id=invite.church_id, quota_limit=invite.quota)
+            link = EventChurchLink(
+                event_id=event_id, church_id=invite.church_id, quota_limit=invite.quota
+            )
             session.add(link)
 
     session.commit()
@@ -405,8 +440,10 @@ class ChurchInviteCreate(SQLModel):
     name: str
     quota: int
 
+
 class BulkInviteCreateRequest(SQLModel):
     invites: list[ChurchInviteCreate]
+
 
 @router.put("/{event_id}/invite-create-bulk")
 def invite_churches_create_bulk(
@@ -414,7 +451,7 @@ def invite_churches_create_bulk(
     session: SessionDep,
     current_user: CurrentUser,
     event_id: uuid.UUID,
-    data: BulkInviteCreateRequest
+    data: BulkInviteCreateRequest,
 ) -> Any:
     """
     Invite multiple churches by NAME.
@@ -442,11 +479,14 @@ def invite_churches_create_bulk(
             link.quota_limit = invite.quota
             session.add(link)
         else:
-            link = EventChurchLink(event_id=event_id, church_id=church.id, quota_limit=invite.quota)
+            link = EventChurchLink(
+                event_id=event_id, church_id=church.id, quota_limit=invite.quota
+            )
             session.add(link)
 
     session.commit()
     return {"message": "Bulk invites processed successfully"}
+
 
 # --- Attendees (Digiter) ---
 @router.post("/{event_id}/register", response_model=AttendeePublic)
@@ -455,7 +495,7 @@ def register_attendee(
     session: SessionDep,
     current_user: CurrentUser,
     event_id: uuid.UUID,
-    attendee_in: AttendeeCreate
+    attendee_in: AttendeeCreate,
 ) -> Any:
     """
     Register an attendee for an event.
@@ -475,6 +515,7 @@ def register_attendee(
 
     # Date Validation
     from datetime import datetime
+
     if event.max_registration_date and datetime.now() > event.max_registration_date:
         raise HTTPException(status_code=400, detail="EVENT_REGISTRATION_CLOSED")
 
@@ -482,10 +523,14 @@ def register_attendee(
         raise HTTPException(status_code=400, detail="USER_NO_CHURCH")
 
     # Lock the Link row for update to prevent race conditions
-    statement = select(EventChurchLink).where(
-        EventChurchLink.event_id == event_id,
-        EventChurchLink.church_id == current_user.church_id
-    ).with_for_update()
+    statement = (
+        select(EventChurchLink)
+        .where(
+            EventChurchLink.event_id == event_id,
+            EventChurchLink.church_id == current_user.church_id,
+        )
+        .with_for_update()
+    )
 
     link = session.exec(statement).first()
 
@@ -493,17 +538,14 @@ def register_attendee(
         raise HTTPException(status_code=400, detail="CHURCH_NOT_INVITED")
 
     # --- Global Quota Validation ---
-     # Calculate current total registrations for this event across all churches
+    # Calculate current total registrations for this event across all churches
     total_reg_statement: Any = select(func.sum(EventChurchLink.registered_count)).where(
         EventChurchLink.event_id == event_id
     )
     total_registered = session.exec(total_reg_statement).one() or 0
 
     if total_registered >= event.total_quota:
-        raise HTTPException(
-            status_code=400,
-            detail="EVENT_QUOTA_EXCEEDED"
-        )
+        raise HTTPException(status_code=400, detail="EVENT_QUOTA_EXCEEDED")
 
     # Note: We still use the link quota for reference, but we don't block registration
     # if the church exceeded its specific quota, as requested by the user.
@@ -514,7 +556,7 @@ def register_attendee(
         **attendee_in.model_dump(),
         event_id=event_id,
         church_id=current_user.church_id,
-        registered_by_id=current_user.id
+        registered_by_id=current_user.id,
     )
     session.add(attendee)
 
@@ -531,7 +573,7 @@ def register_attendee(
     res = AttendeePublic.model_validate(attendee)
     res.registered_by_email = current_user.email
     res.event_name = event.name
-    
+
     church = session.get(Church, attendee.church_id)
     if church:
         res.church_name = church.name
@@ -545,7 +587,7 @@ def search_attendee_by_document(
     session: SessionDep,
     current_user: CurrentUser,
     event_id: uuid.UUID,
-    document_id: str
+    document_id: str,
 ) -> Any:
     """
     Search for an attendee by document ID within a specific event.
@@ -555,35 +597,37 @@ def search_attendee_by_document(
     check_digiter(current_user)
 
     statement = select(Attendee).where(
-        Attendee.event_id == event_id,
-        Attendee.document_id == document_id
+        Attendee.event_id == event_id, Attendee.document_id == document_id
     )
 
-    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [UserRole.ADMIN, UserRole.SUPERVISOR]
-    
+    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
+        UserRole.ADMIN,
+        UserRole.SUPERVISOR,
+    ]
+
     if not is_admin_or_supervisor:
         if not current_user.church_id:
             raise HTTPException(status_code=403, detail="User not linked to a church")
         statement = statement.where(Attendee.church_id == current_user.church_id)
 
     attendee = session.exec(statement).first()
-    
+
     if not attendee:
         raise HTTPException(status_code=404, detail="Attendee not found")
 
     # Hydrate additional fields
     res = AttendeePublic.model_validate(attendee)
-    
+
     # Get registered_by email
     register_user = session.get(User, attendee.registered_by_id)
     if register_user:
         res.registered_by_email = register_user.email
-    
+
     # Get Event Name
     event = session.get(Event, event_id)
     if event:
         res.event_name = event.name
-        
+
     # Get Church Name
     church = session.get(Church, attendee.church_id)
     if church:
@@ -592,13 +636,62 @@ def search_attendee_by_document(
     return res
 
 
+@router.get("/{event_id}/attendees/search-by-name", response_model=list[AttendeePublic])
+def search_attendee_by_name(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID,
+    q: str,
+    limit: int = 10,
+) -> Any:
+    """
+    Search for attendees by name (fuzzy match) within a specific event.
+    Digiter can only search within their own church.
+    """
+    check_digiter(current_user)
+
+    if len(q) < 3:
+        raise HTTPException(
+            status_code=400, detail="Query string too short (min 3 chars)"
+        )
+
+    statement = select(Attendee).where(
+        Attendee.event_id == event_id, col(Attendee.full_name).ilike(f"%{q}%")
+    )
+
+    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
+        UserRole.ADMIN,
+        UserRole.SUPERVISOR,
+    ]
+
+    if not is_admin_or_supervisor:
+        if not current_user.church_id:
+            raise HTTPException(status_code=403, detail="User not linked to a church")
+        statement = statement.where(Attendee.church_id == current_user.church_id)
+
+    # Limit results to prevent overload
+    attendees = session.exec(statement.limit(limit)).all()
+
+    results = []
+    for attendee in attendees:
+        res = AttendeePublic.model_validate(attendee)
+        # Populate Church Name (useful for confirmation)
+        church = session.get(Church, attendee.church_id)
+        if church:
+            res.church_name = church.name
+        results.append(res)
+
+    return results
+
+
 @router.delete("/{event_id}/attendees/{attendee_id}", response_model=dict[str, str])
 def delete_attendee(
     *,
     session: SessionDep,
     current_user: CurrentUser,
     event_id: uuid.UUID,
-    attendee_id: uuid.UUID
+    attendee_id: uuid.UUID,
 ) -> Any:
     """
     Delete an attendee and restore quota.
@@ -610,18 +703,28 @@ def delete_attendee(
         raise HTTPException(status_code=404, detail="Attendee not found")
 
     if attendee.event_id != event_id:
-        raise HTTPException(status_code=400, detail="Attendee does not belong to this event")
+        raise HTTPException(
+            status_code=400, detail="Attendee does not belong to this event"
+        )
 
     # Permission check: Digiter can only delete from their own church
-    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [UserRole.ADMIN, UserRole.SUPERVISOR]
+    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
+        UserRole.ADMIN,
+        UserRole.SUPERVISOR,
+    ]
     if not is_admin_or_supervisor:
-         if attendee.church_id != current_user.church_id:
-             raise HTTPException(status_code=403, detail="Cannot delete attendee from another church")
+        if attendee.church_id != current_user.church_id:
+            raise HTTPException(
+                status_code=403, detail="Cannot delete attendee from another church"
+            )
 
     # Lock EventChurchLink to update quota safely
     link = session.exec(
         select(EventChurchLink)
-        .where(EventChurchLink.event_id == event_id, EventChurchLink.church_id == attendee.church_id)
+        .where(
+            EventChurchLink.event_id == event_id,
+            EventChurchLink.church_id == attendee.church_id,
+        )
         .with_for_update()
     ).first()
 
@@ -638,16 +741,13 @@ def delete_attendee(
 
 @router.get("/{event_id}/duplicates", response_model=list[dict[str, Any]])
 def get_event_duplicates(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID
+    *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
 ) -> Any:
     """
     Get groups of attendees that share the same document_id for a specific event.
     """
     check_admin(current_user)
-    
+
     # Encontrar document_ids duplicados
     statement = (
         select(Attendee.document_id)
@@ -658,7 +758,7 @@ def get_event_duplicates(
         .having(func.count(Attendee.id) > 1)
     )
     duplicate_ids = session.exec(statement).all()
-    
+
     results = []
     for doc_id in duplicate_ids:
         attendees = session.exec(
@@ -666,29 +766,28 @@ def get_event_duplicates(
             .where(Attendee.event_id == event_id, Attendee.document_id == doc_id)
             .order_by(Attendee.created_at.desc())
         ).all()
-        
-        results.append({
-            "document_id": doc_id,
-            "count": len(attendees),
-            "attendees": [AttendeePublic.model_validate(a) for a in attendees]
-        })
-        
+
+        results.append(
+            {
+                "document_id": doc_id,
+                "count": len(attendees),
+                "attendees": [AttendeePublic.model_validate(a) for a in attendees],
+            }
+        )
+
     return results
 
 
 @router.post("/{event_id}/duplicates/cleanup", response_model=dict[str, Any])
 def cleanup_event_duplicates(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID
+    *, session: SessionDep, current_user: CurrentUser, event_id: uuid.UUID
 ) -> Any:
     """
     Delete duplicate attendee registrations, keeping only the most recent one.
     Also synchronizes church counts.
     """
     check_admin(current_user)
-    
+
     # 1. Identificar duplicados
     statement = (
         select(Attendee.document_id)
@@ -699,48 +798,85 @@ def cleanup_event_duplicates(
         .having(func.count(Attendee.id) > 1)
     )
     duplicate_ids = session.exec(statement).all()
-    
+
     total_deleted = 0
     impacted_church_ids = set()
-    
     for doc_id in duplicate_ids:
         attendees = session.exec(
             select(Attendee)
             .where(Attendee.event_id == event_id, Attendee.document_id == doc_id)
-            .order_by(Attendee.created_at.desc()) # El más reciente primero
+            .order_by(col(Attendee.created_at).desc())  # El más reciente primero
         ).all()
-        
+
         # Mantener el primero (más reciente), borrar el resto
         to_delete = attendees[1:]
         for a in to_delete:
             impacted_church_ids.add(a.church_id)
             session.delete(a)
             total_deleted += 1
-            
+
     session.commit()
-    
+
     # 2. Resincronizar contadores para las iglesias afectadas (o todas por seguridad)
     # Por ahora solo las afectadas para eficiencia
     synced_churches = 0
     for church_id in impacted_church_ids:
         link = session.exec(
-            select(EventChurchLink)
-            .where(EventChurchLink.event_id == event_id, EventChurchLink.church_id == church_id)
+            select(EventChurchLink).where(
+                EventChurchLink.event_id == event_id,
+                EventChurchLink.church_id == church_id,
+            )
         ).first()
-        
+
         if link:
             actual_count = session.exec(
-                select(func.count(Attendee.id))
-                .where(Attendee.event_id == event_id, Attendee.church_id == church_id)
+                select(func.count(Attendee.id)).where(
+                    Attendee.event_id == event_id, Attendee.church_id == church_id
+                )
             ).one()
             link.registered_count = actual_count
             session.add(link)
             synced_churches += 1
-            
+
     session.commit()
-    
+
     return {
         "message": f"Successfully cleaned up {total_deleted} duplicates across {synced_churches} churches.",
         "deleted_count": total_deleted,
-        "synced_churches": synced_churches
+        "synced_churches": synced_churches,
     }
+
+
+@router.post(
+    "/{event_id}/attendees/{attendee_id}/checkin", response_model=AttendeePublic
+)
+def checkin_attendee(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID,
+    attendee_id: uuid.UUID,
+) -> Any:
+    """
+    Mark an attendee as checked in.
+    """
+    check_digiter(current_user)
+    attendee = session.get(Attendee, attendee_id)
+
+    if not attendee:
+        raise HTTPException(status_code=404, detail="Attendee not found")
+
+    if attendee.event_id != event_id:
+        raise HTTPException(
+            status_code=400, detail="Attendee does not belong to this event"
+        )
+
+    if attendee.checked_in_at:
+        raise HTTPException(status_code=409, detail="Attendee already checked in")
+
+    attendee.checked_in_at = datetime.now(timezone.utc)
+    attendee.checked_in_by_id = current_user.id
+    session.add(attendee)
+    session.commit()
+    session.refresh(attendee)
+    return attendee

@@ -46,8 +46,10 @@ export function AppSidebar() {
     currentUser?.is_superuser ||
     ["ADMIN", "SUPERVISOR", "DIGITER"].includes(currentUser?.role || "")
   if (canRegister) {
+    console.log("Renderer Ingreso Item", currentUser?.role)
     items.push({ icon: Users, title: t("sidebar.register"), path: "/register" })
     items.push({ icon: UserX, title: t("sidebar.unregister"), path: "/unregister" })
+    items.push({ icon: Shield, title: t("sidebar.checkin"), path: "/checkin" })
   }
 
   if (

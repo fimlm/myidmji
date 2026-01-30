@@ -33,7 +33,8 @@
     "events": "Events",
     "register": "Registrar",
     "admin": "Admin",
-    "unregister": "Unregister"
+    "unregister": "Unregister",
+    "checkin": "Check-in"
   },
   "dashboard": {
     "greeting": "Hi, {{name}} 👋",
@@ -149,5 +150,33 @@
       "editButton": "Edit",
       "successToast": "User updated successfully"
     }
+  },
+  "checkin": {
+    "title": "Check-in Control",
+    "searchTitle": "Search Attendee",
+    "searchDesc": "Scan or type the document ID",
+    "documentLabel": "Document ID",
+    "documentPlaceholder": "Ex: 123456789",
+    "searchButton": "Search",
+    "searching": "Searching...",
+    "selectEvent": "Select Event",
+    "selectEventPlaceholder": "Select an event...",
+    "noEvent": "No event found.",
+    "notFoundTitle": "Not Registered",
+    "notFoundDesc": "This person is not registered for this event.",
+    "notFoundAction": "Try Again",
+    "successTitle": "Check-in Successful!",
+    "alreadyCheckedIn": "⚠️ ALREADY CHECKED IN: {{date}}",
+    "confirmButton": "CONFIRM CHECK-IN",
+    "registering": "Registering...",
+    "cancelButton": "Cancel",
+    "recentLog": "Recent Check-ins (Session)",
+    "noLog": "No check-ins in this session.",
+    "church": "Church",
+    "searchByNameButton": "Search by Name?",
+    "searchByNamePlaceholder": "Enter name (min 3 chars)",
+    "resultsTitle": "Search Results",
+    "noResults": "No matches found.",
+    "backToId": "Back to ID"
   }
 }

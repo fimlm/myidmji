@@ -107,6 +107,18 @@ export const AttendeePublicSchema = {
                 }
             ],
             title: 'Created At'
+        },
+        checked_in_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Checked In At'
         }
     },
     type: 'object',
@@ -439,6 +451,10 @@ export const EventPublicSchema = {
 
 export const EventStatsSchema = {
     properties: {
+        event_name: {
+            type: 'string',
+            title: 'Event Name'
+        },
         total_quota: {
             type: 'integer',
             title: 'Total Quota'
@@ -446,6 +462,10 @@ export const EventStatsSchema = {
         total_registered: {
             type: 'integer',
             title: 'Total Registered'
+        },
+        checked_in_count: {
+            type: 'integer',
+            title: 'Checked In Count'
         },
         church_stats: {
             items: {
@@ -457,7 +477,7 @@ export const EventStatsSchema = {
         }
     },
     type: 'object',
-    required: ['total_quota', 'total_registered', 'church_stats'],
+    required: ['event_name', 'total_quota', 'total_registered', 'checked_in_count', 'church_stats'],
     title: 'EventStats'
 } as const;
 
