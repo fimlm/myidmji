@@ -324,7 +324,7 @@ function Checkin() {
                                                         <div className="flex gap-2">
                                                             <Input
                                                                 placeholder={t("checkin.documentPlaceholder")}
-                                                                className="text-xl h-14"
+                                                                className="text-lg sm:text-xl h-12 sm:h-14"
                                                                 autoFocus
                                                                 autoComplete="off"
                                                                 {...field}
@@ -332,7 +332,7 @@ function Checkin() {
                                                             <Button
                                                                 type="submit"
                                                                 size="lg"
-                                                                className="h-14 px-6"
+                                                                className="h-12 sm:h-14 px-4 sm:px-6"
                                                                 disabled={!selectedEventId || searchMutation.isPending}
                                                             >
                                                                 {searchMutation.isPending ? t("checkin.searching") : <Search className="w-6 h-6" />}
@@ -468,7 +468,7 @@ function Checkin() {
                                         )}
                                     </div>
 
-                                    <div className="flex gap-3">
+                                    <div className="flex flex-col sm:flex-row gap-3">
                                         <Button
                                             variant="outline"
                                             size="lg"
@@ -480,7 +480,7 @@ function Checkin() {
                                         {!searchedAttendee.checked_in_at && (
                                             <Button
                                                 size="lg"
-                                                className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-lg"
+                                                className="flex-1 h-12 bg-green-600 hover:bg-green-700 text-base sm:text-lg"
                                                 onClick={onConfirmCheckin}
                                                 disabled={checkinMutation.isPending}
                                             >
