@@ -99,17 +99,21 @@ def read_events(
         statement = select(Event).offset(skip).limit(limit)
     else:
         if not current_user.church_id:
-            return []
-        statement = (
-            select(Event)
-            .join(EventChurchLink)
-            .where(
-                EventChurchLink.church_id == current_user.church_id,
-                Event.is_active == True,
+            # Bug fix: allow users without a church (newly registered) to see all active events for onboarding/setup
+            statement = (
+                select(Event).where(Event.is_active == True).offset(skip).limit(limit)
             )
-            .offset(skip)
-            .limit(limit)
-        )
+        else:
+            statement = (
+                select(Event)
+                .join(EventChurchLink)
+                .where(
+                    EventChurchLink.church_id == current_user.church_id,
+                    Event.is_active,
+                )
+                .offset(skip)
+                .limit(limit)
+            )
 
     events = session.exec(statement).all()
     return events
@@ -398,6 +402,7 @@ def get_event_attendees_csv(
     results = session.exec(statement).all()
 
     output = io.StringIO()
+    output.write("\ufeff")  # UTF-8 BOM for Microsoft Excel
     writer = csv.writer(output)
 
     # Header
