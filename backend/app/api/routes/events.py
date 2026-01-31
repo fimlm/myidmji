@@ -299,7 +299,7 @@ def get_event_stats(
                     .where(
                         Attendee.event_id == event_id,
                         Attendee.church_id == link.church_id,
-                        Attendee.checked_in_at != None,
+                        Attendee.checked_in_at is not None,
                     )
                 ).one(),
                 "digiters_count": digiters_count,
@@ -707,16 +707,9 @@ def delete_attendee(
             status_code=400, detail="Attendee does not belong to this event"
         )
 
-    # Permission check: Digiter can only delete from their own church
-    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
-        UserRole.ADMIN,
-        UserRole.SUPERVISOR,
-    ]
-    if not is_admin_or_supervisor:
-        if attendee.church_id != current_user.church_id:
-            raise HTTPException(
-                status_code=403, detail="Cannot delete attendee from another church"
-            )
+    # Permission check: For now, we allow global delete for Digiters as per user feedback
+    # (Previously restricted to own church)
+    pass
 
     # Lock EventChurchLink to update quota safely
     link = session.exec(
@@ -752,7 +745,7 @@ def get_event_duplicates(
     statement = (
         select(Attendee.document_id)
         .where(Attendee.event_id == event_id)
-        .where(Attendee.document_id != None)
+        .where(Attendee.document_id is not None)
         .where(Attendee.document_id != "")
         .group_by(Attendee.document_id)
         .having(func.count(Attendee.id) > 1)

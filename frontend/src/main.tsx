@@ -23,12 +23,19 @@ OpenAPI.TOKEN = async () => {
 const handleApiError = (error: any) => {
   const status = error instanceof ApiError ? error.status : error?.status || error?.response?.status
   const url = (error instanceof ApiError ? error.url : error?.config?.url) || ""
+  const body = error instanceof ApiError ? error.body : error?.response?.data
 
-  // Logout on 401 (Session Expired)
-  // Logout on 403/404 ONLY for the current user endpoint (Token invalid or User deleted)
-  // Other 403/404s (e.g., searching or deleting) will NOT close the session
   const isMeEndpoint = url.includes("/users/me") || url.endsWith("/me")
-  if (status === 401 || ([403, 404].includes(status) && isMeEndpoint)) {
+  const isAuthFailureBody = (body as any)?.detail === "Could not validate credentials"
+
+  // 1. Logout on 401 (Unauthorized - Standard)
+  // 2. Logout on 403 IF it's a credential validation failure (from deps.py)
+  // 3. Logout on 404 ONLY if it's the current user endpoint (User deleted from DB)
+  if (
+    status === 401 ||
+    (status === 403 && isAuthFailureBody) ||
+    (status === 404 && isMeEndpoint)
+  ) {
     localStorage.removeItem("access_token")
     if (window.location.pathname !== "/login") {
       window.location.href = "/login"
