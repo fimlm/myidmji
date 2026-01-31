@@ -21,9 +21,14 @@ OpenAPI.TOKEN = async () => {
 }
 
 const handleApiError = (error: any) => {
-  const status = error instanceof ApiError ? error.status : error?.status
-  // Also treat 404 on /users/me as auth failure (happens if user deleted but token survives)
-  if ([401, 403, 404].includes(status)) {
+  const status = error instanceof ApiError ? error.status : error?.status || error?.response?.status
+  const url = (error instanceof ApiError ? error.url : error?.config?.url) || ""
+
+  // Logout on 401 (Session Expired)
+  // Logout on 403/404 ONLY for the current user endpoint (Token invalid or User deleted)
+  // Other 403/404s (e.g., searching or deleting) will NOT close the session
+  const isMeEndpoint = url.includes("/users/me") || url.endsWith("/me")
+  if (status === 401 || ([403, 404].includes(status) && isMeEndpoint)) {
     localStorage.removeItem("access_token")
     if (window.location.pathname !== "/login") {
       window.location.href = "/login"
