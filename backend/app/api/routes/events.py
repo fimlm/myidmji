@@ -1,11 +1,14 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Any, cast
+from typing import Any, Annotated, cast
 
-from fastapi import APIRouter, HTTPException
+import csv
+import io
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
 from sqlmodel import SQLModel, col, func, or_, select
 
-from app.api.deps import CurrentUser, SessionDep
+from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.models import User, UserPublic, UserRole
 from app.models_events import (
     Attendee,
@@ -373,6 +376,65 @@ def get_event_attendees(
         results.append(attendee_public)
 
     return results
+
+
+@router.get("/{event_id}/attendees/export-csv")
+def get_event_attendees_csv(
+    *,
+    session: SessionDep,
+    current_user: Annotated[User, Depends(get_current_active_superuser)],
+    event_id: uuid.UUID,
+) -> Any:
+    """
+    Export all attendees for an event to CSV.
+    Superadmin only.
+    """
+    statement = (
+        select(Attendee, Church.name, User.email)
+        .join(Church, cast(Any, Attendee.church_id == Church.id))
+        .join(User, cast(Any, Attendee.registered_by_id == User.id))
+        .where(Attendee.event_id == event_id)
+    )
+    results = session.exec(statement).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Header
+    writer.writerow(
+        [
+            "Full Name",
+            "Document ID",
+            "Church (Iglesia)",
+            "Registered By (Email)",
+            "Registration Date",
+            "Checked-in At",
+        ]
+    )
+
+    for attendee, church_name, email in results:
+        writer.writerow(
+            [
+                attendee.full_name,
+                attendee.document_id or "N/A",
+                church_name,
+                email,
+                attendee.created_at.strftime("%Y-%m-%d %H:%M:%S")
+                if attendee.created_at
+                else "N/A",
+                attendee.checked_in_at.strftime("%Y-%m-%d %H:%M:%S")
+                if attendee.checked_in_at
+                else "N/A",
+            ]
+        )
+
+    output.seek(0)
+    filename = f"attendees_event_{event_id}.csv"
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"},
+    )
 
 
 @router.get("/{event_id}/digiters", response_model=list[UserPublic])

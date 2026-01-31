@@ -1,9 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Link, createFileRoute } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
-import { Search } from "lucide-react"
+import { Download, Search } from "lucide-react"
+import axios from "axios"
 import { toast } from "sonner"
 import { type AttendeePublic, EventsService, type UserPublic } from "@/client"
+import useAuth from "@/hooks/useAuth"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -50,20 +52,48 @@ function EventEditor() {
     queryFn: () => EventsService.getEventDigiters({ eventId }),
   })
 
+  const { user: currentUser } = useAuth()
+  const isSuperAdmin = currentUser?.is_superuser
+
   const [searchTerm, setSearchTerm] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [skip, setSkip] = useState(0)
+  const limit = 100
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchTerm)
+      setSkip(0) // Reset to first page on search
     }, 500)
     return () => clearTimeout(handler)
   }, [searchTerm])
 
   const { data: attendees } = useQuery({
-    queryKey: ["eventAttendees", eventId, debouncedSearch],
-    queryFn: () => EventsService.getEventAttendees({ eventId, q: debouncedSearch }),
+    queryKey: ["eventAttendees", eventId, debouncedSearch, skip],
+    queryFn: () => EventsService.getEventAttendees({ eventId, q: debouncedSearch, skip, limit }),
   })
+
+  const handleExportCSV = async () => {
+    try {
+      const response = await axios({
+        url: `${import.meta.env.VITE_API_URL}/api/v1/events/${eventId}/attendees/export-csv`,
+        method: 'GET',
+        responseType: 'blob',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("access_token")}`
+        }
+      })
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `attendees_event_${eventId}.csv`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (error) {
+      toast.error("Error al exportar CSV")
+    }
+  }
 
   // Mutation to update church quota
   const inviteMutation = useMutation({
@@ -332,14 +362,26 @@ function EventEditor() {
                   List of all attendees registered for this event.
                 </CardDescription>
               </div>
-              <div className="relative w-full sm:max-w-xs">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by name or ID..."
-                  className="pl-8"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:max-w-md">
+                <div className="relative w-full">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name or ID..."
+                    className="pl-8"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                {isSuperAdmin && (
+                  <Button
+                    variant="outline"
+                    className="shrink-0"
+                    onClick={handleExportCSV}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Exportar CSV
+                  </Button>
+                )}
               </div>
             </CardHeader>
             <CardContent>
@@ -379,6 +421,27 @@ function EventEditor() {
                   )}
                 </TableBody>
               </Table>
+              <div className="flex items-center justify-end space-x-2 py-4">
+                <div className="text-sm text-muted-foreground mr-4">
+                  Mostrando registros {skip + 1} - {skip + (attendees?.length || 0)}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSkip((prev) => Math.max(0, prev - limit))}
+                  disabled={skip === 0}
+                >
+                  Anterior
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSkip((prev) => prev + limit)}
+                  disabled={!attendees || attendees.length < limit}
+                >
+                  Siguiente
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -386,8 +449,8 @@ function EventEditor() {
         <TabsContent value="maintenance">
           <MaintenanceTab eventId={eventId} />
         </TabsContent>
-      </Tabs>
-    </div>
+      </Tabs >
+    </div >
   )
 }
 
