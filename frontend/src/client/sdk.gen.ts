@@ -25,7 +25,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Read Churches
      * Retrieve churches.
@@ -48,7 +48,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Create Event
      * Create new event.
@@ -68,7 +68,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Read Events
      * Retrieve events.
@@ -91,7 +91,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Get My Events
      * Get all active events that the current user's church is invited to.
@@ -104,7 +104,7 @@ export class EventsService {
             url: '/api/v1/events/my-events'
         });
     }
-    
+
     /**
      * Read Event
      * Get event by ID.
@@ -125,7 +125,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Update Event
      * Update an event.
@@ -149,7 +149,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Invite Church To Event
      * Invite a church to an event and assign quota.
@@ -176,7 +176,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Get Event Churches
      * Get all churches invited to this event.
@@ -198,7 +198,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Get My Registration Count
      * Get the total number of approved/registered attendees by the current user for this event.
@@ -219,7 +219,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Get Event Stats
      * Get detailed statistics for an event.
@@ -240,7 +240,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Get Event Attendees
      * Get all attendees registered for an event.
@@ -260,14 +260,15 @@ export class EventsService {
             },
             query: {
                 skip: data.skip,
-                limit: data.limit
+                limit: data.limit,
+                q: data.q
             },
             errors: {
                 422: 'Validation Error'
             }
         });
     }
-    
+
     /**
      * Get Event Digiters
      * Get all digiters associated with churches invited to this event.
@@ -288,7 +289,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Invite Churches Bulk
      * Invite multiple churches to an event with quotas.
@@ -312,7 +313,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Invite Churches Create Bulk
      * Invite multiple churches by NAME.
@@ -338,7 +339,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Register Attendee
      * Register an attendee for an event.
@@ -363,7 +364,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Search Attendee By Document
      * Search for an attendee by document ID within a specific event.
@@ -390,7 +391,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Search Attendee By Name
      * Search for attendees by name (fuzzy match) within a specific event.
@@ -418,7 +419,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Delete Attendee
      * Delete an attendee and restore quota.
@@ -441,7 +442,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Get Event Duplicates
      * Get groups of attendees that share the same document_id for a specific event.
@@ -462,7 +463,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Cleanup Event Duplicates
      * Delete duplicate attendee registrations, keeping only the most recent one.
@@ -484,7 +485,7 @@ export class EventsService {
             }
         });
     }
-    
+
     /**
      * Checkin Attendee
      * Mark an attendee as checked in.
@@ -532,7 +533,7 @@ export class ItemsService {
             }
         });
     }
-    
+
     /**
      * Create Item
      * Create new item.
@@ -552,7 +553,7 @@ export class ItemsService {
             }
         });
     }
-    
+
     /**
      * Read Item
      * Get item by ID.
@@ -573,7 +574,7 @@ export class ItemsService {
             }
         });
     }
-    
+
     /**
      * Update Item
      * Update an item.
@@ -597,7 +598,7 @@ export class ItemsService {
             }
         });
     }
-    
+
     /**
      * Delete Item
      * Delete an item.
@@ -640,7 +641,7 @@ export class LoginService {
             }
         });
     }
-    
+
     /**
      * Login Google
      * Login with Google ID Token.
@@ -661,7 +662,7 @@ export class LoginService {
             }
         });
     }
-    
+
     /**
      * Test Token
      * Test access token
@@ -674,7 +675,7 @@ export class LoginService {
             url: '/api/v1/login/test-token'
         });
     }
-    
+
     /**
      * Recover Password
      * Password Recovery
@@ -695,7 +696,7 @@ export class LoginService {
             }
         });
     }
-    
+
     /**
      * Reset Password
      * Reset password
@@ -715,7 +716,7 @@ export class LoginService {
             }
         });
     }
-    
+
     /**
      * Recover Password Html Content
      * HTML Content for Password Recovery
@@ -785,7 +786,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Create User
      * Create new user.
@@ -805,7 +806,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Read User Me
      * Get current user.
@@ -818,7 +819,7 @@ export class UsersService {
             url: '/api/v1/users/me'
         });
     }
-    
+
     /**
      * Delete User Me
      * Delete own user.
@@ -831,7 +832,7 @@ export class UsersService {
             url: '/api/v1/users/me'
         });
     }
-    
+
     /**
      * Update User Me
      * Update own user.
@@ -851,7 +852,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Update Password Me
      * Update own password.
@@ -871,7 +872,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Register User
      * Create new user without the need to be logged in.
@@ -891,7 +892,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Update Users Bulk
      * Update multiple users at once (Role, Church, Activation).
@@ -912,7 +913,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Read User By Id
      * Get a specific user by id.
@@ -933,7 +934,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Update User
      * Update a user.
@@ -957,7 +958,7 @@ export class UsersService {
             }
         });
     }
-    
+
     /**
      * Delete User
      * Delete a user.
@@ -1001,7 +1002,7 @@ export class UtilsService {
             }
         });
     }
-    
+
     /**
      * Health Check
      * @returns boolean Successful Response

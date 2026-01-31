@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Any, cast
 
 from fastapi import APIRouter, HTTPException
-from sqlmodel import SQLModel, col, func, select
+from sqlmodel import SQLModel, col, func, or_, select
 
 from app.api.deps import CurrentUser, SessionDep
 from app.models import User, UserPublic, UserRole
@@ -329,6 +329,7 @@ def get_event_attendees(
     event_id: uuid.UUID,
     skip: int = 0,
     limit: int = 100,
+    q: str | None = None,
 ) -> Any:
     """
     Get all attendees registered for an event.
@@ -341,6 +342,14 @@ def get_event_attendees(
         .join(User, cast(Any, Attendee.registered_by_id == User.id))
         .where(Attendee.event_id == event_id)
     )
+
+    if q:
+        statement = statement.where(
+            or_(
+                col(Attendee.full_name).ilike(f"%{q}%"),
+                col(Attendee.document_id).ilike(f"%{q}%"),
+            )
+        )
 
     # Privacy Isolation: If not Admin/Supervisor, only show attendees from their own church
     is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
@@ -757,7 +766,7 @@ def get_event_duplicates(
         attendees = session.exec(
             select(Attendee)
             .where(Attendee.event_id == event_id, Attendee.document_id == doc_id)
-            .order_by(Attendee.created_at.desc())
+            .order_by(col(Attendee.created_at).desc())
         ).all()
 
         results.append(

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Link, createFileRoute } from "@tanstack/react-router"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { Search } from "lucide-react"
 import { toast } from "sonner"
 import { type AttendeePublic, EventsService, type UserPublic } from "@/client"
 import { Button } from "@/components/ui/button"
@@ -49,9 +50,19 @@ function EventEditor() {
     queryFn: () => EventsService.getEventDigiters({ eventId }),
   })
 
+  const [searchTerm, setSearchTerm] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchTerm)
+    }, 500)
+    return () => clearTimeout(handler)
+  }, [searchTerm])
+
   const { data: attendees } = useQuery({
-    queryKey: ["eventAttendees", eventId],
-    queryFn: () => EventsService.getEventAttendees({ eventId }),
+    queryKey: ["eventAttendees", eventId, debouncedSearch],
+    queryFn: () => EventsService.getEventAttendees({ eventId, q: debouncedSearch }),
   })
 
   // Mutation to update church quota
@@ -314,11 +325,22 @@ function EventEditor() {
 
         <TabsContent value="attendees">
           <Card>
-            <CardHeader>
-              <CardTitle>Registered Attendees</CardTitle>
-              <CardDescription>
-                List of all attendees registered for this event.
-              </CardDescription>
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+              <div>
+                <CardTitle>Registered Attendees</CardTitle>
+                <CardDescription>
+                  List of all attendees registered for this event.
+                </CardDescription>
+              </div>
+              <div className="relative w-full sm:max-w-xs">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or ID..."
+                  className="pl-8"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
             </CardHeader>
             <CardContent>
               <Table>

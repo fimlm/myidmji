@@ -319,6 +319,7 @@ export type EventsGetEventAttendeesData = {
     eventId: string;
     limit?: number;
     skip?: number;
+    q?: string;
 };
 
 export type EventsGetEventAttendeesResponse = (Array<AttendeePublic>);
