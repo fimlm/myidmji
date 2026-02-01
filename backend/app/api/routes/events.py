@@ -345,8 +345,9 @@ def get_event_attendees(
 
     # Base query
     statement = (
-        select(Attendee, User.email)
+        select(Attendee, User.email, Church.name)
         .join(User, cast(Any, Attendee.registered_by_id == User.id))
+        .join(Church, cast(Any, Attendee.church_id == Church.id))
         .where(Attendee.event_id == event_id)
     )
 
@@ -375,9 +376,10 @@ def get_event_attendees(
     attendees_data = session.exec(statement.offset(skip).limit(limit)).all()
 
     results = []
-    for attendee, email in attendees_data:
+    for attendee, email, church_name in attendees_data:
         attendee_public = AttendeePublic.model_validate(attendee)
         attendee_public.registered_by_email = email
+        attendee_public.church_name = church_name
         results.append(attendee_public)
 
     return results
@@ -975,8 +977,9 @@ def search_attendees_by_name(
     # 3. GLOBAL SEARCH: Digitizers can see anyone in the event (no church filter).
 
     statement = (
-        select(Attendee, User.email)
+        select(Attendee, User.email, Church.name)
         .join(User, cast(Any, Attendee.registered_by_id == User.id))
+        .join(Church, cast(Any, Attendee.church_id == Church.id))
         .where(Attendee.event_id == event_id)
         .where(col(Attendee.full_name).ilike(f"%{q}%"))
         .limit(limit)
@@ -985,9 +988,10 @@ def search_attendees_by_name(
     attendees_data = session.exec(statement).all()
 
     results = []
-    for attendee, email in attendees_data:
+    for attendee, email, church_name in attendees_data:
         attendee_public = AttendeePublic.model_validate(attendee)
         attendee_public.registered_by_email = email
+        attendee_public.church_name = church_name
         results.append(attendee_public)
 
     return results
@@ -1010,8 +1014,9 @@ def search_attendee_by_document(
 
     # Global search (Cross-church) for the check-in process
     statement = (
-        select(Attendee, User.email)
+        select(Attendee, User.email, Church.name)
         .join(User, cast(Any, Attendee.registered_by_id == User.id))
+        .join(Church, cast(Any, Attendee.church_id == Church.id))
         .where(Attendee.event_id == event_id)
         .where(Attendee.document_id == document_id)
     )
@@ -1022,30 +1027,8 @@ def search_attendee_by_document(
         # 404 handled by frontend to show "Not Registered" card
         raise HTTPException(status_code=404, detail="Attendee not found")
 
-    attendee, email = result
+    attendee, email, church_name = result
     attendee_public = AttendeePublic.model_validate(attendee)
     attendee_public.registered_by_email = email
+    attendee_public.church_name = church_name
     return attendee_public
-
-    # Search Logic:
-    # 1. Base query matches event_id
-    # 2. Name matches fuzzy query
-    # 3. GLOBAL SEARCH: Digitizers can see anyone in the event (no church filter).
-
-    statement = (
-        select(Attendee, User.email)
-        .join(User, cast(Any, Attendee.registered_by_id == User.id))
-        .where(Attendee.event_id == event_id)
-        .where(col(Attendee.full_name).ilike(f"%{q}%"))
-        .limit(limit)
-    )
-
-    attendees_data = session.exec(statement).all()
-
-    results = []
-    for attendee, email in attendees_data:
-        attendee_public = AttendeePublic.model_validate(attendee)
-        attendee_public.registered_by_email = email
-        results.append(attendee_public)
-
-    return results

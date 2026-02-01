@@ -390,6 +390,7 @@ function EventEditor() {
                   <TableRow>
                     <TableHead>Full Name</TableHead>
                     <TableHead>Document ID</TableHead>
+                    <TableHead>Church</TableHead>
                     <TableHead>Registered By</TableHead>
                     <TableHead>Registration Date</TableHead>
                   </TableRow>
@@ -402,6 +403,7 @@ function EventEditor() {
                           {attendee.full_name}
                         </TableCell>
                         <TableCell>{attendee.document_id || "N/A"}</TableCell>
+                        <TableCell>{attendee.church_name || "N/A"}</TableCell>
                         <TableCell className="text-muted-foreground text-sm">
                           {attendee.registered_by_email || "N/A"}
                         </TableCell>
