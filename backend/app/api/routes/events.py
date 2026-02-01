@@ -991,3 +991,61 @@ def search_attendees_by_name(
         results.append(attendee_public)
 
     return results
+
+
+@router.get(
+    "/{event_id}/attendees/search-by-document", response_model=AttendeePublic | None
+)
+def search_attendee_by_document(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID,
+    document_id: str,
+) -> Any:
+    """
+    Search a single attendee by document_id.
+    """
+    check_digiter(current_user)
+
+    # Global search (Cross-church) for the check-in process
+    statement = (
+        select(Attendee, User.email)
+        .join(User, cast(Any, Attendee.registered_by_id == User.id))
+        .where(Attendee.event_id == event_id)
+        .where(Attendee.document_id == document_id)
+    )
+
+    result = session.exec(statement).first()
+
+    if not result:
+        # 404 handled by frontend to show "Not Registered" card
+        raise HTTPException(status_code=404, detail="Attendee not found")
+
+    attendee, email = result
+    attendee_public = AttendeePublic.model_validate(attendee)
+    attendee_public.registered_by_email = email
+    return attendee_public
+
+    # Search Logic:
+    # 1. Base query matches event_id
+    # 2. Name matches fuzzy query
+    # 3. GLOBAL SEARCH: Digitizers can see anyone in the event (no church filter).
+
+    statement = (
+        select(Attendee, User.email)
+        .join(User, cast(Any, Attendee.registered_by_id == User.id))
+        .where(Attendee.event_id == event_id)
+        .where(col(Attendee.full_name).ilike(f"%{q}%"))
+        .limit(limit)
+    )
+
+    attendees_data = session.exec(statement).all()
+
+    results = []
+    for attendee, email in attendees_data:
+        attendee_public = AttendeePublic.model_validate(attendee)
+        attendee_public.registered_by_email = email
+        results.append(attendee_public)
+
+    return results
