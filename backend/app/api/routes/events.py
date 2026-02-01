@@ -306,7 +306,7 @@ def get_event_stats(
                     .where(
                         Attendee.event_id == event_id,
                         Attendee.church_id == link.church_id,
-                        Attendee.checked_in_at is not None,
+                        Attendee.checked_in_at != None,
                     )
                 ).one(),
                 "digiters_count": digiters_count,
