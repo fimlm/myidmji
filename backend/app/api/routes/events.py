@@ -359,12 +359,13 @@ def get_event_attendees(
         )
 
     # Privacy Isolation: If not Admin/Supervisor, only show attendees from their own church
+    # UNLESS they are searching (q is present), in which case they can find anyone in the event (Check-in use case)
     is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
         UserRole.ADMIN,
         UserRole.SUPERVISOR,
     ]
 
-    if not is_admin_or_supervisor:
+    if not is_admin_or_supervisor and not q:
         if current_user.church_id:
             statement = statement.where(Attendee.church_id == current_user.church_id)
         else:
@@ -949,3 +950,44 @@ def checkin_attendee(
     session.commit()
     session.refresh(attendee)
     return attendee
+
+
+@router.get("/{event_id}/attendees/search-by-name", response_model=list[AttendeePublic])
+def search_attendees_by_name(
+    *,
+    session: SessionDep,
+    current_user: CurrentUser,
+    event_id: uuid.UUID,
+    q: str,
+    limit: int = 10,
+) -> Any:
+    """
+    Fuzzy search attendees by name.
+    """
+    check_digiter(current_user)
+
+    if len(q) < 3:
+        return []
+
+    # Search Logic:
+    # 1. Base query matches event_id
+    # 2. Name matches fuzzy query
+    # 3. GLOBAL SEARCH: Digitizers can see anyone in the event (no church filter).
+
+    statement = (
+        select(Attendee, User.email)
+        .join(User, cast(Any, Attendee.registered_by_id == User.id))
+        .where(Attendee.event_id == event_id)
+        .where(col(Attendee.full_name).ilike(f"%{q}%"))
+        .limit(limit)
+    )
+
+    attendees_data = session.exec(statement).all()
+
+    results = []
+    for attendee, email in attendees_data:
+        attendee_public = AttendeePublic.model_validate(attendee)
+        attendee_public.registered_by_email = email
+        results.append(attendee_public)
+
+    return results
