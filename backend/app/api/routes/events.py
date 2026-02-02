@@ -660,108 +660,6 @@ def register_attendee(
     return res
 
 
-@router.get("/{event_id}/attendees/search", response_model=AttendeePublic)
-def search_attendee_by_document(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID,
-    document_id: str,
-) -> Any:
-    """
-    Search for an attendee by document ID within a specific event.
-    Digiter can only search within their own church.
-    Admin/Supervisor can search globally (optional - for now sticking to strict logic).
-    """
-    check_digiter(current_user)
-
-    statement = select(Attendee).where(
-        Attendee.event_id == event_id, Attendee.document_id == document_id
-    )
-
-    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
-        UserRole.ADMIN,
-        UserRole.SUPERVISOR,
-    ]
-
-    if not is_admin_or_supervisor:
-        if not current_user.church_id:
-            raise HTTPException(status_code=403, detail="User not linked to a church")
-        statement = statement.where(Attendee.church_id == current_user.church_id)
-
-    attendee = session.exec(statement).first()
-
-    if not attendee:
-        raise HTTPException(status_code=404, detail="Attendee not found")
-
-    # Hydrate additional fields
-    res = AttendeePublic.model_validate(attendee)
-
-    # Get registered_by email
-    register_user = session.get(User, attendee.registered_by_id)
-    if register_user:
-        res.registered_by_email = register_user.email
-
-    # Get Event Name
-    event = session.get(Event, event_id)
-    if event:
-        res.event_name = event.name
-
-    # Get Church Name
-    church = session.get(Church, attendee.church_id)
-    if church:
-        res.church_name = church.name
-
-    return res
-
-
-@router.get("/{event_id}/attendees/search-by-name", response_model=list[AttendeePublic])
-def search_attendee_by_name(
-    *,
-    session: SessionDep,
-    current_user: CurrentUser,
-    event_id: uuid.UUID,
-    q: str,
-    limit: int = 10,
-) -> Any:
-    """
-    Search for attendees by name (fuzzy match) within a specific event.
-    Digiter can only search within their own church.
-    """
-    check_digiter(current_user)
-
-    if len(q) < 3:
-        raise HTTPException(
-            status_code=400, detail="Query string too short (min 3 chars)"
-        )
-
-    statement = select(Attendee).where(
-        Attendee.event_id == event_id, col(Attendee.full_name).ilike(f"%{q}%")
-    )
-
-    is_admin_or_supervisor = current_user.is_superuser or current_user.role in [
-        UserRole.ADMIN,
-        UserRole.SUPERVISOR,
-    ]
-
-    if not is_admin_or_supervisor:
-        if not current_user.church_id:
-            raise HTTPException(status_code=403, detail="User not linked to a church")
-        statement = statement.where(Attendee.church_id == current_user.church_id)
-
-    # Limit results to prevent overload
-    attendees = session.exec(statement.limit(limit)).all()
-
-    results = []
-    for attendee in attendees:
-        res = AttendeePublic.model_validate(attendee)
-        # Populate Church Name (useful for confirmation)
-        church = session.get(Church, attendee.church_id)
-        if church:
-            res.church_name = church.name
-        results.append(res)
-
-    return results
 
 
 @router.delete("/{event_id}/attendees/{attendee_id}", response_model=dict[str, str])
@@ -998,7 +896,7 @@ def search_attendees_by_name(
 
 
 @router.get(
-    "/{event_id}/attendees/search-by-document", response_model=AttendeePublic | None
+    "/{event_id}/attendees/search", response_model=AttendeePublic | None
 )
 def search_attendee_by_document(
     *,
